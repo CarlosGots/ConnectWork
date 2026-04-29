@@ -1,3 +1,9 @@
+com\connectwork\util\GsonUtil.class
+com\connectwork\model\Usuario.class
 com\connectwork\servlets\TestServlet.class
 com\connectwork\util\CorsFilter.class
+com\connectwork\util\JWTUtil.class
 com\connectwork\util\ConexionBD.class
+com\connectwork\dao\UsuarioDAO.class
+com\connectwork\servlets\AuthServlet.class
+com\connectwork\util\PasswordUtil.class
