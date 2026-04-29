@@ -1,0 +1,3 @@
+com\connectwork\servlets\TestServlet.class
+com\connectwork\util\CorsFilter.class
+com\connectwork\util\ConexionBD.class
