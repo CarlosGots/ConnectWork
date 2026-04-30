@@ -1,0 +1,74 @@
+.menu-lateral {
+  width: 240px;
+  min-height: calc(100vh - 64px);
+  background: white;
+  border-right: 1px solid var(--borde, #e1e5eb);
+  padding: 20px 12px;
+  flex-shrink: 0;
+  position: sticky;
+  top: 64px;
+}
+
+.menu-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* ============================================ */
+/* Items del menú */
+/* ============================================ */
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 14px;
+  border-radius: 10px;
+  text-decoration: none;
+  color: var(--texto-suave, #6c757d);
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.menu-item svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.menu-item:hover {
+  background: var(--fondo-sutil, #f0f3ff);
+  color: var(--primario, #667eea);
+}
+
+/* Item activo (la ruta actual) */
+.menu-item.activo {
+  background: var(--gradiente, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
+}
+
+.menu-item.activo:hover {
+  color: white;
+}
+
+/* ============================================ */
+/* Responsive: en móviles colapsa solo a íconos */
+/* ============================================ */
+@media (max-width: 900px) {
+  .menu-lateral {
+    width: 64px;
+    padding: 20px 8px;
+  }
+
+  .menu-texto {
+    display: none;
+  }
+
+  .menu-item {
+    justify-content: center;
+    padding: 11px;
+  }
+}

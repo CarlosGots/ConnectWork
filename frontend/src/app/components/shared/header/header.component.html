@@ -1,1 +1,35 @@
-<p>header works!</p>
+<header class="header">
+
+  <!-- Lado izquierdo: logo + nombre -->
+  <a [routerLink]="rutaInicio()" class="logo">
+    <div class="logo-icono">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M13 2 L3 14 H12 L11 22 L21 10 H12 L13 2 Z"/>
+      </svg>
+    </div>
+    <span class="logo-texto">ConnectWork</span>
+  </a>
+
+  <!-- Lado derecho: usuario y acciones -->
+  <div class="usuario-area">
+
+    <div class="usuario-info">
+      <div class="avatar">{{ iniciales() }}</div>
+      <div class="nombre-rol">
+        <span class="nombre">{{ nombreUsuario() }}</span>
+        <span class="rol">{{ etiquetaRol() }}</span>
+      </div>
+    </div>
+
+    <button class="btn-cerrar" (click)="cerrarSesion()" title="Cerrar sesión">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+           stroke-width="1.8" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15.75 9V5.25A2.25 2.25 0 0 0 13.5 3h-6a2.25 2.25 0 0 0-2.25 2.25v13.5A2.25 2.25 0 0 0 7.5 21h6a2.25 2.25 0 0 0 2.25-2.25V15M12 9l-3 3m0 0 3 3m-3-3h12.75" />
+      </svg>
+      <span class="btn-cerrar-texto">Cerrar sesión</span>
+    </button>
+
+  </div>
+</header>

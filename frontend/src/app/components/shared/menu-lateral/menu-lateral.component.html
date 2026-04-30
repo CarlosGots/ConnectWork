@@ -1,1 +1,19 @@
-<p>menu-lateral works!</p>
+<aside class="menu-lateral">
+  <nav class="menu-nav">
+
+    @for (item of itemsMenu(); track item.ruta) {
+      <a [routerLink]="item.ruta"
+         routerLinkActive="activo"
+         [routerLinkActiveOptions]="{ exact: true }"
+         class="menu-item"
+         [title]="item.etiqueta">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="1.5" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.icono" />
+        </svg>
+        <span class="menu-texto">{{ item.etiqueta }}</span>
+      </a>
+    }
+
+  </nav>
+</aside>

@@ -1,63 +1,111 @@
-<div class="login-container">
-  <div class="login-card anim-slide-up">
+<div class="split-container">
 
-    <!-- Encabezado -->
-    <div class="login-header">
-      <h1>ConnectWork</h1>
-      <p class="subtitulo">Plataforma de servicios freelance</p>
-    </div>
+  <!-- ============================================ -->
+  <!-- LADO IZQUIERDO: branding -->
+  <!-- ============================================ -->
+  <div class="lado-marca">
+    <div class="contenido-marca">
 
-    <!-- Formulario -->
-    <form (ngSubmit)="iniciarSesion()" #loginForm="ngForm">
-      <h2>Iniciar sesión</h2>
-
-      <div class="campo">
-        <label for="username">Usuario</label>
-        <input
-          type="text"
-          id="username"
-          name="username"
-          [ngModel]="username()"
-          (ngModelChange)="username.set($event)"
-          placeholder="tu-usuario"
-          autocomplete="username"
-          required>
-      </div>
-
-      <div class="campo">
-        <label for="password">Contraseña</label>
-        <input
-          type="password"
-          id="password"
-          name="password"
-          [ngModel]="password()"
-          (ngModelChange)="password.set($event)"
-          placeholder="••••••••"
-          autocomplete="current-password"
-          required>
-      </div>
-
-      <!-- Mensaje de error -->
-      @if (mensajeError()) {
-        <div class="mensaje-error">
-          {{ mensajeError() }}
+      <!-- Logo arriba -->
+      <div class="marca-header">
+        <div class="logo-grande">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M13 2 L3 14 H12 L11 22 L21 10 H12 L13 2 Z"/>
+          </svg>
         </div>
-      }
+        <span class="logo-marca">ConnectWork</span>
+      </div>
 
-      <!-- Botón de envío -->
-      <button type="submit" class="btn-primario" [disabled]="cargando()">
-        @if (cargando()) {
-          Iniciando sesión...
-        } @else {
-          Entrar
+      <!-- Mensaje principal -->
+      <div class="marca-hero">
+        <h1>Conecta talento<br>con oportunidades.</h1>
+        <p class="marca-subtitulo">
+          La plataforma donde clientes y freelancers crecen juntos.
+        </p>
+      </div>
+
+      <!-- Carrusel rotatorio de tarjetas -->
+      <div class="marca-tarjetas">
+        @for (tarjeta of tarjetas; track $index) {
+          <div class="tarjeta-deco"
+               [class.tarjeta-activa]="$index === indiceActivo()"
+               [class.tarjeta-saliendo]="$index === obtenerIndicesVisibles().saliendo"
+               [class.tarjeta-siguiente]="$index === obtenerIndicesVisibles().siguiente">
+            <div class="tarjeta-icono">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                   stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="tarjeta.iconoPath" />
+              </svg>
+            </div>
+            <div class="tarjeta-texto">
+              <strong>{{ tarjeta.titulo }}</strong>
+              <span>{{ tarjeta.descripcion }}</span>
+            </div>
+          </div>
         }
-      </button>
-    </form>
+      </div>
 
-    <!-- Link a registro -->
-    <div class="login-footer">
-      <p>¿No tienes cuenta? <a routerLink="/registro">Regístrate aquí</a></p>
     </div>
-
   </div>
+
+  <!-- ============================================ -->
+  <!-- LADO DERECHO: formulario -->
+  <!-- ============================================ -->
+  <div class="lado-formulario">
+    <div class="formulario-card anim-fade">
+
+      <div class="formulario-header">
+        <h2>Bienvenido de nuevo</h2>
+        <p>Inicia sesión para continuar</p>
+      </div>
+
+      <form (ngSubmit)="iniciarSesion()" #loginForm="ngForm">
+
+        <div class="campo">
+          <label for="username">Usuario</label>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            [ngModel]="username()"
+            (ngModelChange)="username.set($event)"
+            placeholder="tu-usuario"
+            autocomplete="username"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="password">Contraseña</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($event)"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required>
+        </div>
+
+        @if (mensajeError()) {
+          <div class="mensaje-error anim-slide-down">{{ mensajeError() }}</div>
+        }
+
+        <button type="submit" class="btn-primario" [disabled]="cargando()">
+          @if (cargando()) {
+            Iniciando sesión...
+          } @else {
+            Entrar
+          }
+        </button>
+      </form>
+
+      <div class="formulario-footer">
+        <p>¿No tienes cuenta? <a routerLink="/registro">Regístrate aquí</a></p>
+      </div>
+
+    </div>
+  </div>
+
 </div>

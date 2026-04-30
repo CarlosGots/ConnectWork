@@ -1,0 +1,162 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 24px;
+  background: white;
+  border-bottom: 1px solid var(--borde, #e1e5eb);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* ============================================ */
+/* Logo */
+/* ============================================ */
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  color: var(--texto, #2E4057);
+  transition: opacity 0.2s;
+}
+
+.logo:hover {
+  opacity: 0.85;
+}
+
+.logo-icono {
+  width: 36px;
+  height: 36px;
+  background: var(--gradiente, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+}
+
+.logo-icono svg {
+  width: 20px;
+  height: 20px;
+}
+
+.logo-texto {
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+/* ============================================ */
+/* Área del usuario */
+/* ============================================ */
+.usuario-area {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.usuario-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px 6px 6px;
+  border-radius: 24px;
+  transition: background 0.2s;
+}
+
+.usuario-info:hover {
+  background: var(--fondo-sutil, #f0f3ff);
+}
+
+/* Avatar con iniciales */
+.avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--gradiente, linear-gradient(135deg, #667eea 0%, #764ba2 100%));
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+}
+
+.nombre-rol {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.nombre {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--texto, #2E4057);
+}
+
+.rol {
+  font-size: 11px;
+  color: var(--texto-suave, #6c757d);
+  font-weight: 500;
+}
+
+/* ============================================ */
+/* Botón cerrar sesión */
+/* ============================================ */
+.btn-cerrar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  background: transparent;
+  border: 1.5px solid var(--borde, #e1e5eb);
+  color: var(--texto-suave, #6c757d);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.btn-cerrar svg {
+  width: 16px;
+  height: 16px;
+}
+
+.btn-cerrar:hover {
+  border-color: #dc3545;
+  color: #dc3545;
+  background: #fff5f5;
+}
+
+/* ============================================ */
+/* Responsive (pantallas chicas) */
+/* ============================================ */
+@media (max-width: 640px) {
+  .header {
+    padding: 0 16px;
+  }
+
+  .logo-texto {
+    display: none;  /* Solo el ícono en móvil */
+  }
+
+  .nombre-rol {
+    display: none;  /* Solo avatar en móvil */
+  }
+
+  .btn-cerrar-texto {
+    display: none;  /* Solo el ícono en móvil */
+  }
+
+  .btn-cerrar {
+    padding: 8px 10px;
+  }
+}
