@@ -1,1 +1,236 @@
-/* You can add global styles to this file, and also import other style files */
+/* ============================================
+   ESTILOS GLOBALES — ConnectWork
+   ============================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  color: #2E4057;
+  background: #f7f8fa;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================
+   PALETA DE COLORES (variables)
+   ============================================ */
+:root {
+  --primario: #667eea;
+  --primario-oscuro: #4a5fc1;
+  --secundario: #764ba2;
+  --gradiente: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+  --texto: #2E4057;
+  --texto-suave: #6c757d;
+  --texto-tenue: #95a1b3;
+
+  --fondo: #f7f8fa;
+  --fondo-sutil: #f0f3ff;
+  --borde: #e1e5eb;
+  --borde-suave: #f0f0f0;
+
+  --exito: #2e7d32;
+  --exito-fondo: #e8f5e9;
+  --error: #c62828;
+  --error-fondo: #fff0f0;
+  --advertencia: #f57c00;
+  --advertencia-fondo: #fff8e1;
+
+  --sombra-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --sombra-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --sombra-lg: 0 10px 30px rgba(0, 0, 0, 0.12);
+  --sombra-xl: 0 20px 60px rgba(0, 0, 0, 0.2);
+
+  --radio-sm: 6px;
+  --radio-md: 10px;
+  --radio-lg: 14px;
+  --radio-xl: 20px;
+
+  --transicion: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ============================================
+   ANIMACIONES DE ENTRADA
+   ============================================ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50%      { opacity: 0.5; }
+}
+
+/* ============================================
+   CLASES UTILITARIAS DE ANIMACIÓN
+   ============================================ */
+.anim-fade        { animation: fadeIn 0.4s var(--transicion); }
+.anim-slide-up    { animation: slideUp 0.5s var(--transicion); }
+.anim-slide-down  { animation: slideDown 0.3s var(--transicion); }
+.anim-scale       { animation: scaleIn 0.3s var(--transicion); }
+
+/* Animaciones escalonadas para listas */
+.anim-stagger > *:nth-child(1) { animation: slideUp 0.4s var(--transicion) 0.05s both; }
+.anim-stagger > *:nth-child(2) { animation: slideUp 0.4s var(--transicion) 0.10s both; }
+.anim-stagger > *:nth-child(3) { animation: slideUp 0.4s var(--transicion) 0.15s both; }
+.anim-stagger > *:nth-child(4) { animation: slideUp 0.4s var(--transicion) 0.20s both; }
+.anim-stagger > *:nth-child(5) { animation: slideUp 0.4s var(--transicion) 0.25s both; }
+.anim-stagger > *:nth-child(6) { animation: slideUp 0.4s var(--transicion) 0.30s both; }
+
+/* ============================================
+   FOCUS GLOBAL CONSISTENTE
+   ============================================ */
+*:focus {
+  outline: none;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--primario);
+  outline-offset: 2px;
+}
+
+/* Inputs y textareas */
+input, textarea, select {
+  font-family: inherit;
+  transition: all 0.2s var(--transicion);
+}
+
+input:focus, textarea:focus, select:focus {
+  border-color: var(--primario) !important;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+}
+
+/* ============================================
+   BOTONES (clases reutilizables)
+   ============================================ */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border: none;
+  border-radius: var(--radio-md);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.2s var(--transicion);
+  text-decoration: none;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primario {
+  background: var(--gradiente);
+  color: white;
+  box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.btn-primario:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(102, 126, 234, 0.45);
+}
+
+.btn-primario:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.btn-secundario {
+  background: white;
+  color: var(--texto);
+  border: 1.5px solid var(--borde);
+}
+
+.btn-secundario:hover:not(:disabled) {
+  border-color: var(--primario);
+  color: var(--primario);
+  background: var(--fondo-sutil);
+}
+
+.btn-fantasma {
+  background: transparent;
+  color: var(--texto-suave);
+}
+
+.btn-fantasma:hover:not(:disabled) {
+  background: var(--fondo-sutil);
+  color: var(--primario);
+}
+
+/* ============================================
+   SCROLLBAR PERSONALIZADO
+   ============================================ */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 5px;
+  border: 2px solid var(--fondo);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primario);
+}
+
+/* ============================================
+   SELECCIÓN DE TEXTO
+   ============================================ */
+::selection {
+  background: var(--primario);
+  color: white;
+}

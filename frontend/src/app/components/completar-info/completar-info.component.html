@@ -1,0 +1,158 @@
+<div class="completar-container">
+  <div class="completar-card anim-slide-up">
+
+    <!-- Encabezado -->
+    <div class="completar-header">
+      <h1>Completa tu perfil</h1>
+      <p class="bienvenida">¡Bienvenido/a, {{ usuario()?.nombreCompleto }}!</p>
+      <p class="ayuda">
+        Para empezar a usar ConnectWork, necesitamos algunos datos adicionales.
+      </p>
+    </div>
+
+    <form (ngSubmit)="guardarInformacion()">
+
+      <!-- ============================================ -->
+      <!-- FORMULARIO DEL CLIENTE -->
+      <!-- ============================================ -->
+      @if (esCliente()) {
+        <div class="seccion">
+          <h2>Información de tu empresa</h2>
+
+          <div class="campo">
+            <label for="descripcionEmpresa">Descripción de tu empresa o perfil</label>
+            <textarea
+              id="descripcionEmpresa"
+              [ngModel]="descripcionEmpresa()"
+              (ngModelChange)="descripcionEmpresa.set($event)"
+              name="descripcionEmpresa"
+              placeholder="Cuéntanos brevemente a qué se dedica tu empresa..."
+              rows="3"
+              required></textarea>
+          </div>
+
+          <div class="campo">
+            <label for="sector">Sector o industria</label>
+            <input
+              type="text"
+              id="sector"
+              [ngModel]="sector()"
+              (ngModelChange)="sector.set($event)"
+              name="sector"
+              placeholder="Ejemplo: Tecnología, Salud, Comercio"
+              required>
+          </div>
+
+          <div class="campo">
+            <label for="sitioWeb">Sitio web <span class="opcional">(opcional)</span></label>
+            <input
+              type="url"
+              id="sitioWeb"
+              [ngModel]="sitioWeb()"
+              (ngModelChange)="sitioWeb.set($event)"
+              name="sitioWeb"
+              placeholder="https://miempresa.com">
+          </div>
+        </div>
+      }
+
+      <!-- ============================================ -->
+      <!-- FORMULARIO DEL FREELANCER -->
+      <!-- ============================================ -->
+      @if (esFreelancer()) {
+        <div class="seccion">
+          <h2>Tu perfil profesional</h2>
+
+          <div class="campo">
+            <label for="biografia">Biografía profesional</label>
+            <textarea
+              id="biografia"
+              [ngModel]="biografia()"
+              (ngModelChange)="biografia.set($event)"
+              name="biografia"
+              placeholder="Describe tu experiencia, áreas de especialización y qué te diferencia..."
+              rows="4"
+              required></textarea>
+            <small class="contador">{{ biografia().length }} / mínimo 30 caracteres</small>
+          </div>
+
+          <div class="fila">
+            <div class="campo">
+              <label for="nivelExperiencia">Nivel de experiencia</label>
+              <select
+                id="nivelExperiencia"
+                [ngModel]="nivelExperiencia()"
+                (ngModelChange)="nivelExperiencia.set($event)"
+                name="nivelExperiencia"
+                required>
+                <option value="">Selecciona...</option>
+                <option value="JUNIOR">Junior (0–2 años)</option>
+                <option value="SEMI_SENIOR">Semi-Senior (2–5 años)</option>
+                <option value="SENIOR">Senior (5+ años)</option>
+              </select>
+            </div>
+
+            <div class="campo">
+              <label for="tarifaHora">Tarifa por hora (Q)</label>
+              <input
+                type="number"
+                id="tarifaHora"
+                [ngModel]="tarifaHora()"
+                (ngModelChange)="tarifaHora.set($event)"
+                name="tarifaHora"
+                placeholder="Ejemplo: 100"
+                min="1"
+                step="0.01"
+                required>
+            </div>
+          </div>
+
+          <div class="campo">
+            <label>Tus habilidades</label>
+            <p class="ayuda-pequena">Selecciona todas las habilidades en las que tengas experiencia.</p>
+
+            <div class="lista-habilidades">
+              @for (habilidad of habilidadesDisponibles(); track habilidad.id) {
+                <button
+                  type="button"
+                  class="chip-habilidad"
+                  [class.chip-activo]="estaHabilidadSeleccionada(habilidad.id)"
+                  (click)="toggleHabilidad(habilidad.id)">
+                  {{ habilidad.nombre }}
+                </button>
+              }
+            </div>
+
+            @if (habilidadesSeleccionadas().length > 0) {
+              <small class="contador">
+                {{ habilidadesSeleccionadas().length }} habilidad{{ habilidadesSeleccionadas().length === 1 ? '' : 'es' }} seleccionada{{ habilidadesSeleccionadas().length === 1 ? '' : 's' }}
+              </small>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Mensaje de error -->
+      @if (mensajeError()) {
+        <div class="mensaje-error anim-slide-down">{{ mensajeError() }}</div>
+      }
+
+      <!-- Botones -->
+      <div class="acciones">
+        <button type="button" class="btn btn-fantasma" (click)="cerrarSesion()">
+          Cerrar sesión
+        </button>
+
+        <button type="submit" class="btn btn-primario" [disabled]="cargando()">
+          @if (cargando()) {
+            Guardando...
+          } @else {
+            Continuar al panel
+          }
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+</div>
