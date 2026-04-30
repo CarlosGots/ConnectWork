@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 
 import { AuthService } from '../../services/auth.service';
+import { UsuarioService, InfoClienteRequest, InfoFreelancerRequest } from '../../services/usuario.service';
 
 /**
  * Componente que el usuario ve al iniciar sesión por primera vez.
@@ -18,8 +19,9 @@ import { AuthService } from '../../services/auth.service';
 })
 export class CompletarInfoComponent {
 
-  private authService = inject(AuthService);
-  private router = inject(Router);
+private authService = inject(AuthService);
+private usuarioService = inject(UsuarioService);
+private router = inject(Router);
 
   // Datos del usuario actual
   usuario = computed(() => this.authService.obtenerUsuarioActual());
@@ -75,26 +77,56 @@ export class CompletarInfoComponent {
     return this.habilidadesSeleccionadas().includes(id);
   }
 
-  /**
-   * Procesa el envío del formulario.
-   */
-  guardarInformacion(): void {
-    const errorValidacion = this.validar();
-    if (errorValidacion) {
-      this.mensajeError.set(errorValidacion);
-      return;
-    }
-
-    this.cargando.set(true);
-    this.mensajeError.set('');
-
-    // TODO: cuando tengamos el endpoint en el backend, llamar al servicio aquí
-    // Por ahora simulamos un guardado exitoso para probar el flujo visual
-    setTimeout(() => {
-      this.cargando.set(false);
-      this.redirigirAlDashboard();
-    }, 800);
+ /**
+ * Procesa el envío del formulario.
+ * Llama al backend para guardar la información según el rol del usuario.
+ */
+guardarInformacion(): void {
+  const errorValidacion = this.validar();
+  if (errorValidacion) {
+    this.mensajeError.set(errorValidacion);
+    return;
   }
+
+  this.cargando.set(true);
+  this.mensajeError.set('');
+
+  // Construir el payload según el rol
+  const datos: InfoClienteRequest | InfoFreelancerRequest = this.esCliente()
+    ? {
+        descripcionEmpresa: this.descripcionEmpresa().trim(),
+        sector: this.sector().trim(),
+        sitioWeb: this.sitioWeb().trim() || undefined
+      }
+    : {
+        biografia: this.biografia().trim(),
+        nivelExperiencia: this.nivelExperiencia() as 'JUNIOR' | 'SEMI_SENIOR' | 'SENIOR',
+        tarifaHora: this.tarifaHora()!,
+        habilidades: this.habilidadesSeleccionadas()
+      };
+
+  this.usuarioService.completarInfo(datos).subscribe({
+    next: () => {
+      this.cargando.set(false);
+      // Actualizar el estado local: el usuario ya no es "primera vez"
+      this.authService.marcarComoConfigurado();
+      this.redirigirAlDashboard();
+    },
+    error: (err) => {
+      this.cargando.set(false);
+      if (err.status === 401) {
+        this.mensajeError.set('Tu sesión expiró. Inicia sesión de nuevo.');
+        setTimeout(() => this.router.navigate(['/login']), 2000);
+      } else if (err.status === 400) {
+        this.mensajeError.set(err.error?.error || 'Datos inválidos. Revisa los campos.');
+      } else if (err.status === 0) {
+        this.mensajeError.set('No se pudo conectar al servidor.');
+      } else {
+        this.mensajeError.set('Error al guardar la información. Intenta de nuevo.');
+      }
+    }
+  });
+}
 
   /**
    * Valida el formulario según el rol del usuario.

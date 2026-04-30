@@ -115,4 +115,16 @@ export class AuthService {
       return null;
     }
   }
+  /**
+ * Marca al usuario actual como ya configurado (primeraVez = false).
+ * Útil tras completar la información inicial.
+ */
+marcarComoConfigurado(): void {
+  const usuarioActual = this.usuarioActualSignal();
+  if (usuarioActual) {
+    const usuarioActualizado = { ...usuarioActual, primeraVez: false };
+    localStorage.setItem(this.USUARIO_KEY, JSON.stringify(usuarioActualizado));
+    this.usuarioActualSignal.set(usuarioActualizado);
+  }
+}
 }
