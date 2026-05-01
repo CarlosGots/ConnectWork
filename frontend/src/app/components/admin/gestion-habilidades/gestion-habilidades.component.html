@@ -1,1 +1,211 @@
-<p>gestion-habilidades works!</p>
+<app-header></app-header>
+
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+
+  <main class="contenido">
+
+    <!-- Encabezado de la página -->
+    <div class="pagina-header">
+      <div>
+        <h1>Habilidades</h1>
+        <p class="subtitulo">Define las habilidades específicas dentro de cada categoría</p>
+      </div>
+
+      <button class="btn btn-primario" (click)="abrirModalCrear()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Nueva habilidad
+      </button>
+    </div>
+
+    <!-- Mensajes -->
+    @if (mensajeExito()) {
+      <div class="mensaje-exito anim-slide-down">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+        {{ mensajeExito() }}
+      </div>
+    }
+
+    @if (mensajeError()) {
+      <div class="mensaje-error anim-slide-down">{{ mensajeError() }}</div>
+    }
+
+    <!-- Filtros por categoría -->
+    @if (categorias().length > 0) {
+      <div class="filtros">
+        <button class="chip-filtro"
+                [class.chip-activo]="filtroCategoria() === 0"
+                (click)="cambiarFiltro(0)">
+          Todas ({{ habilidades().length }})
+        </button>
+
+        @for (categoria of categorias(); track categoria.idCategoria) {
+          <button class="chip-filtro"
+                  [class.chip-activo]="filtroCategoria() === categoria.idCategoria"
+                  (click)="cambiarFiltro(categoria.idCategoria)">
+            {{ categoria.nombre }}
+            <span class="chip-contador">{{ categoria.totalHabilidades || 0 }}</span>
+          </button>
+        }
+      </div>
+    }
+
+    <!-- Lista de habilidades -->
+    @if (cargando()) {
+      <div class="estado-vacio">
+        <p>Cargando habilidades...</p>
+      </div>
+    } @else if (habilidadesFiltradas().length === 0) {
+      <div class="estado-vacio">
+        <p>No hay habilidades en esta categoría. Crea la primera.</p>
+      </div>
+    } @else {
+      <div class="grid-habilidades">
+        @for (habilidad of habilidadesFiltradas(); track habilidad.idHabilidad) {
+          <div class="tarjeta-habilidad" [class.tarjeta-inactiva]="!habilidad.activa">
+
+            <div class="tarjeta-encabezado">
+              <h3>{{ habilidad.nombre }}</h3>
+
+              @if (habilidad.activa) {
+                <span class="badge badge-activo">Activa</span>
+              } @else {
+                <span class="badge badge-inactivo">Inactiva</span>
+              }
+            </div>
+
+            <div class="tarjeta-meta">
+              <span class="meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.8" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M2.25 7.125C2.25 6.504 2.754 6 3.375 6h6c.621 0 1.125.504 1.125 1.125v3.75c0 .621-.504 1.125-1.125 1.125h-6a1.125 1.125 0 0 1-1.125-1.125v-3.75ZM14.25 8.625c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v8.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 0 1-1.125-1.125v-8.25ZM3.75 16.125c0-.621.504-1.125 1.125-1.125h5.25c.621 0 1.125.504 1.125 1.125v2.25c0 .621-.504 1.125-1.125 1.125h-5.25a1.125 1.125 0 0 1-1.125-1.125v-2.25Z" />
+                </svg>
+                {{ habilidad.nombreCategoria }}
+              </span>
+            </div>
+
+            <div class="tarjeta-acciones">
+              <button class="btn-accion" (click)="abrirModalEditar(habilidad)">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.8" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                </svg>
+                Editar
+              </button>
+
+              <button class="btn-accion" (click)="toggleEstado(habilidad)">
+                @if (habilidad.activa) {
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                       stroke-width="1.8" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                  </svg>
+                  Desactivar
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                       stroke-width="1.8" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  </svg>
+                  Activar
+                }
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  </main>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL: Crear / Editar -->
+<!-- ============================================ -->
+@if (modalAbierto()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal-card anim-scale" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h2>{{ modoEdicion() ? 'Editar habilidad' : 'Nueva habilidad' }}</h2>
+        <button class="btn-cerrar-modal" (click)="cerrarModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+               stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form (ngSubmit)="guardar()" class="modal-form">
+
+        <div class="campo">
+          <label for="nombreHabilidad">Nombre</label>
+          <input
+            type="text"
+            id="nombreHabilidad"
+            [ngModel]="nombreInput()"
+            (ngModelChange)="nombreInput.set($event)"
+            name="nombreHabilidad"
+            placeholder="Ej: React, Photoshop, SEO"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="categoriaHabilidad">Categoría</label>
+          <select
+            id="categoriaHabilidad"
+            [ngModel]="idCategoriaInput()"
+            (ngModelChange)="idCategoriaInput.set(+$event)"
+            name="categoriaHabilidad"
+            required>
+            <option [value]="0">Selecciona una categoría...</option>
+            @for (categoria of categorias(); track categoria.idCategoria) {
+              <option [value]="categoria.idCategoria">{{ categoria.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        @if (modoEdicion()) {
+          <div class="campo-checkbox">
+            <input
+              type="checkbox"
+              id="activaHabilidad"
+              [checked]="activaInput()"
+              (change)="activaInput.set($any($event.target).checked)"
+              name="activaHabilidad">
+            <label for="activaHabilidad">Habilidad activa</label>
+          </div>
+        }
+
+        @if (mensajeError()) {
+          <div class="mensaje-error anim-slide-down">{{ mensajeError() }}</div>
+        }
+
+        <div class="modal-acciones">
+          <button type="button" class="btn btn-secundario" (click)="cerrarModal()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primario" [disabled]="guardando()">
+            @if (guardando()) {
+              Guardando...
+            } @else {
+              {{ modoEdicion() ? 'Guardar cambios' : 'Crear habilidad' }}
+            }
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+}

@@ -1,1 +1,185 @@
-<p>gestion-categorias works!</p>
+<app-header></app-header>
+
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+
+  <main class="contenido">
+
+    <!-- Encabezado de la página -->
+    <div class="pagina-header">
+      <div>
+        <h1>Categorías</h1>
+        <p class="subtitulo">Gestiona las categorías de servicios de la plataforma</p>
+      </div>
+
+      <button class="btn btn-primario" (click)="abrirModalCrear()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Nueva categoría
+      </button>
+    </div>
+
+    <!-- Mensaje de éxito -->
+    @if (mensajeExito()) {
+      <div class="mensaje-exito anim-slide-down">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+        {{ mensajeExito() }}
+      </div>
+    }
+
+    <!-- Lista de categorías -->
+    @if (cargando()) {
+      <div class="estado-vacio">
+        <p>Cargando categorías...</p>
+      </div>
+    } @else if (categorias().length === 0) {
+      <div class="estado-vacio">
+        <p>Aún no hay categorías. Crea la primera.</p>
+      </div>
+    } @else {
+      <div class="grid-categorias">
+        @for (categoria of categorias(); track categoria.idCategoria) {
+          <div class="tarjeta-categoria" [class.tarjeta-inactiva]="!categoria.activa">
+
+            <div class="tarjeta-encabezado">
+              <h3>{{ categoria.nombre }}</h3>
+
+              @if (categoria.activa) {
+                <span class="badge badge-activo">Activa</span>
+              } @else {
+                <span class="badge badge-inactivo">Inactiva</span>
+              }
+            </div>
+
+            <p class="descripcion">{{ categoria.descripcion || 'Sin descripción' }}</p>
+
+            <div class="tarjeta-meta">
+              <span class="meta-item">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.8" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09Z" />
+                </svg>
+                {{ categoria.totalHabilidades || 0 }} habilidad{{ (categoria.totalHabilidades || 0) === 1 ? '' : 'es' }}
+              </span>
+            </div>
+
+            <div class="tarjeta-acciones">
+              <button class="btn-accion" (click)="abrirModalEditar(categoria)">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                     stroke-width="1.8" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                </svg>
+                Editar
+              </button>
+
+              <button class="btn-accion" (click)="toggleEstado(categoria)">
+                @if (categoria.activa) {
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                       stroke-width="1.8" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M18.364 18.364A9 9 0 0 0 5.636 5.636m12.728 12.728A9 9 0 0 1 5.636 5.636m12.728 12.728L5.636 5.636" />
+                  </svg>
+                  Desactivar
+                } @else {
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                       stroke-width="1.8" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                          d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  </svg>
+                  Activar
+                }
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+  </main>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL: Crear / Editar -->
+<!-- ============================================ -->
+@if (modalAbierto()) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal-card anim-scale" (click)="$event.stopPropagation()">
+
+      <div class="modal-header">
+        <h2>{{ modoEdicion() ? 'Editar categoría' : 'Nueva categoría' }}</h2>
+        <button class="btn-cerrar-modal" (click)="cerrarModal()">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+               stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <form (ngSubmit)="guardar()" class="modal-form">
+
+        <div class="campo">
+          <label for="nombreCategoria">Nombre</label>
+          <input
+            type="text"
+            id="nombreCategoria"
+            [ngModel]="nombreInput()"
+            (ngModelChange)="nombreInput.set($event)"
+            name="nombreCategoria"
+            placeholder="Ej: Diseño UX"
+            required>
+        </div>
+
+        <div class="campo">
+          <label for="descripcionCategoria">Descripción</label>
+          <textarea
+            id="descripcionCategoria"
+            [ngModel]="descripcionInput()"
+            (ngModelChange)="descripcionInput.set($event)"
+            name="descripcionCategoria"
+            placeholder="Breve descripción de la categoría..."
+            rows="3"></textarea>
+        </div>
+
+        @if (modoEdicion()) {
+          <div class="campo-checkbox">
+            <input
+              type="checkbox"
+              id="activaCategoria"
+              [checked]="activaInput()"
+              (change)="activaInput.set($any($event.target).checked)"
+              name="activaCategoria">
+            <label for="activaCategoria">Categoría activa</label>
+          </div>
+        }
+
+        @if (mensajeError()) {
+          <div class="mensaje-error anim-slide-down">{{ mensajeError() }}</div>
+        }
+
+        <div class="modal-acciones">
+          <button type="button" class="btn btn-secundario" (click)="cerrarModal()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primario" [disabled]="guardando()">
+            @if (guardando()) {
+              Guardando...
+            } @else {
+              {{ modoEdicion() ? 'Guardar cambios' : 'Crear categoría' }}
+            }
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+}

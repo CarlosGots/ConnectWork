@@ -3,11 +3,17 @@ com\connectwork\model\Usuario.class
 com\connectwork\dao\ClienteDAO.class
 com\connectwork\servlets\TestServlet.class
 com\connectwork\util\CorsFilter.class
+com\connectwork\servlets\CategoriaServlet.class
 com\connectwork\util\ConexionBD.class
 com\connectwork\dao\UsuarioDAO.class
 com\connectwork\servlets\AuthServlet.class
+com\connectwork\dao\CategoriaDAO.class
 com\connectwork\servlets\UsuarioServlet.class
 com\connectwork\util\JWTFilter.class
+com\connectwork\model\Categoria.class
 com\connectwork\dao\FreelancerDAO.class
+com\connectwork\model\Habilidad.class
 com\connectwork\util\JWTUtil.class
+com\connectwork\servlets\HabilidadServlet.class
+com\connectwork\dao\HabilidadDAO.class
 com\connectwork\util\PasswordUtil.class

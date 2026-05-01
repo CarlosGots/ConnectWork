@@ -38,10 +38,23 @@ export const routes: Routes = [
     data: { roles: ['FREELANCER'] }
   },
 
-  // Administrador
+  
+ // Administrador
   {
     path: 'admin',
     loadComponent: () => import('./components/admin/dashboard-admin/dashboard-admin.component').then(m => m.DashboardAdminComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMINISTRADOR'] }
+  },
+  {
+    path: 'admin/categorias',
+    loadComponent: () => import('./components/admin/gestion-categorias/gestion-categorias.component').then(m => m.GestionCategoriasComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMINISTRADOR'] }
+  },
+  {
+    path: 'admin/habilidades',
+    loadComponent: () => import('./components/admin/gestion-habilidades/gestion-habilidades.component').then(m => m.GestionHabilidadesComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMINISTRADOR'] }
   },
