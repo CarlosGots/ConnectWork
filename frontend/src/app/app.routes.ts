@@ -58,6 +58,14 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMINISTRADOR'] }
   },
+  {
+    path: 'admin/comision',
+    loadComponent: () => import('./components/admin/cambiar-comision/cambiar-comision.component').then(m => m.CambiarComisionComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMINISTRADOR'] }
+  },
 
   { path: '**', redirectTo: 'login' }
+
+  
 ];

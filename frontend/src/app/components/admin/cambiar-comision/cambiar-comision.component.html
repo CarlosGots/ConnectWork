@@ -1,1 +1,129 @@
-<p>cambiar-comision works!</p>
+<app-header></app-header>
+
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+
+  <main class="contenido">
+
+    <!-- Encabezado -->
+    <div class="pagina-header">
+      <div>
+        <h1>Comisión de la plataforma</h1>
+        <p class="subtitulo">Configura el porcentaje que ConnectWork cobra por cada contrato</p>
+      </div>
+    </div>
+
+    <!-- Mensajes -->
+    @if (mensajeExito()) {
+      <div class="mensaje-exito anim-slide-down">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+        {{ mensajeExito() }}
+      </div>
+    }
+
+    @if (cargando()) {
+      <div class="estado-vacio"><p>Cargando...</p></div>
+    } @else {
+      <div class="grid-comision">
+
+        <!-- Card: comisión actual + cambiar -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icono">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                   stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Z" />
+              </svg>
+            </div>
+            <h2>Comisión vigente</h2>
+          </div>
+
+          @if (comisionActiva()) {
+            <div class="comision-actual">
+              <span class="porcentaje-grande">{{ comisionActiva()!.porcentaje }}%</span>
+              <p class="desde">Vigente desde {{ formatearFecha(comisionActiva()!.fechaInicio) }}</p>
+              @if (comisionActiva()!.nombreAdminCambio) {
+                <p class="admin-cambio">Configurado por {{ comisionActiva()!.nombreAdminCambio }}</p>
+              }
+            </div>
+
+            <div class="separador"></div>
+
+            <div class="campo-cambio">
+              <label for="nuevoPorcentaje">Nuevo porcentaje (%)</label>
+              <div class="input-con-simbolo">
+                <input
+                  type="number"
+                  id="nuevoPorcentaje"
+                  [ngModel]="nuevoPorcentaje()"
+                  (ngModelChange)="nuevoPorcentaje.set($event)"
+                  name="nuevoPorcentaje"
+                  min="0"
+                  max="100"
+                  step="0.5"
+                  placeholder="Ej: 15">
+                <span class="simbolo">%</span>
+              </div>
+
+              @if (mensajeError()) {
+                <div class="mensaje-error anim-slide-down">{{ mensajeError() }}</div>
+              }
+
+              <button class="btn btn-primario btn-full" (click)="guardar()" [disabled]="guardando()">
+                @if (guardando()) {
+                  Guardando...
+                } @else {
+                  Aplicar nuevo porcentaje
+                }
+              </button>
+
+              <p class="nota">
+                ⚠️ El cambio aplica solo a contratos <strong>nuevos</strong>.
+                Los contratos en curso mantienen el porcentaje con que fueron creados.
+              </p>
+            </div>
+          }
+        </div>
+
+        <!-- Card: historial -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-icono">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                   stroke-width="1.8" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+              </svg>
+            </div>
+            <h2>Historial de cambios</h2>
+          </div>
+
+          @if (historial().length === 0) {
+            <p class="sin-historial">Aún no hay cambios registrados.</p>
+          } @else {
+            <div class="tabla-historial">
+              @for (item of historial(); track item.idComision) {
+                <div class="fila-historial" [class.fila-activa]="item.activa">
+                  <div class="fila-info">
+                    <span class="fila-porcentaje">{{ item.porcentaje }}%</span>
+                    <span class="fila-fecha">{{ formatearFecha(item.fechaInicio) }}</span>
+                  </div>
+                  @if (item.activa) {
+                    <span class="badge badge-activo">Vigente</span>
+                  } @else {
+                    <span class="badge badge-inactivo">Anterior</span>
+                  }
+                </div>
+              }
+            </div>
+          }
+        </div>
+
+      </div>
+    }
+
+  </main>
+</div>
