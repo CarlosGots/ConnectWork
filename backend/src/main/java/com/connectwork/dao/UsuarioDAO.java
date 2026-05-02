@@ -9,7 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
+import java.util.ArrayList;
+import java.util.List;
 /**
  * Acceso a datos para la entidad Usuario.
  * Contiene los métodos necesarios para registro, login y consultas básicas.
@@ -148,4 +149,47 @@ public class UsuarioDAO {
         }
         return u;
     }
+    /**
+ * Lista todos los usuarios del sistema.
+ */
+public List<Usuario> listarTodos() {
+    List<Usuario> lista = new ArrayList<>();
+    String sql = "SELECT * FROM usuarios ORDER BY fecha_creacion DESC";
+
+    Connection con = null;
+    try {
+        con = ConexionBD.obtenerConexion();
+        PreparedStatement ps = con.prepareStatement(sql);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            lista.add(mapearUsuario(rs));
+        }
+    } catch (SQLException e) {
+        System.err.println("Error al listar usuarios: " + e.getMessage());
+    } finally {
+        ConexionBD.cerrarConexion(con);
+    }
+    return lista;
+}
+
+/**
+ * Activa o desactiva un usuario.
+ */
+public boolean cambiarEstado(int idUsuario, boolean activo) {
+    String sql = "UPDATE usuarios SET activo = ? WHERE id_usuario = ?";
+
+    Connection con = null;
+    try {
+        con = ConexionBD.obtenerConexion();
+        PreparedStatement ps = con.prepareStatement(sql);
+        ps.setBoolean(1, activo);
+        ps.setInt(2, idUsuario);
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        System.err.println("Error al cambiar estado: " + e.getMessage());
+    } finally {
+        ConexionBD.cerrarConexion(con);
+    }
+    return false;
+}
 }

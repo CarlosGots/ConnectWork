@@ -1,1 +1,155 @@
-<p>publicar-proyecto works!</p>
+<app-header></app-header>
+
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+
+  <main class="contenido">
+
+    <div class="pagina-header">
+      <button class="btn-volver" (click)="volver()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round"
+                d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+        </svg>
+        Volver
+      </button>
+      <div>
+        <h1>Publicar proyecto</h1>
+        <p class="subtitulo">Describe tu proyecto y encuentra al freelancer ideal</p>
+      </div>
+    </div>
+
+    <div class="formulario-card anim-slide-up">
+
+      <form (ngSubmit)="publicar()">
+
+        <!-- Título -->
+        <div class="campo">
+          <label for="titulo">Título del proyecto *</label>
+          <input
+            type="text"
+            id="titulo"
+            [ngModel]="titulo()"
+            (ngModelChange)="titulo.set($event)"
+            name="titulo"
+            placeholder="Ej: Diseño de logo para panadería artesanal"
+            maxlength="200"
+            required>
+          <small class="contador-chars">{{ titulo().length }}/200</small>
+        </div>
+
+        <!-- Descripción -->
+        <div class="campo">
+          <label for="descripcion">Descripción detallada *</label>
+          <textarea
+            id="descripcion"
+            [ngModel]="descripcion()"
+            (ngModelChange)="descripcion.set($event)"
+            name="descripcion"
+            placeholder="Describe qué necesitas, qué resultado esperas, si tienes referencias visuales, etc."
+            rows="5"
+            required></textarea>
+        </div>
+
+        <!-- Categoría + Presupuesto en fila -->
+        <div class="fila">
+          <div class="campo">
+            <label for="categoria">Categoría *</label>
+            <select
+              id="categoria"
+              [ngModel]="idCategoria()"
+              (ngModelChange)="onCategoriaChange($event)"
+              name="categoria"
+              required>
+              <option [value]="0">Selecciona una categoría...</option>
+              @for (cat of categorias(); track cat.idCategoria) {
+                <option [value]="cat.idCategoria">{{ cat.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="campo">
+            <label for="presupuesto">Presupuesto (Q) *</label>
+            <div class="input-con-simbolo">
+              <span class="simbolo-izq">Q</span>
+              <input
+                type="number"
+                id="presupuesto"
+                [ngModel]="presupuesto()"
+                (ngModelChange)="presupuesto.set($event)"
+                name="presupuesto"
+                placeholder="500.00"
+                min="1"
+                step="0.01"
+                required>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fecha límite -->
+        <div class="campo campo-fecha">
+          <label for="fechaLimite">Fecha límite de entrega *</label>
+          <input
+            type="date"
+            id="fechaLimite"
+            [ngModel]="fechaLimite()"
+            (ngModelChange)="fechaLimite.set($event)"
+            name="fechaLimite"
+            [min]="fechaMinima"
+            required>
+        </div>
+
+        <!-- Habilidades requeridas -->
+        @if (idCategoria() > 0) {
+          <div class="campo">
+            <label>Habilidades requeridas <span class="opcional">(opcional)</span></label>
+            <p class="ayuda-campo">Selecciona las habilidades que debería tener el freelancer.</p>
+
+            @if (habilidades().length === 0) {
+              <p class="sin-habilidades">Esta categoría no tiene habilidades registradas.</p>
+            } @else {
+              <div class="chips-habilidades">
+                @for (h of habilidades(); track h.idHabilidad) {
+                  <button
+                    type="button"
+                    class="chip"
+                    [class.chip-activo]="estaSeleccionada(h.idHabilidad)"
+                    (click)="toggleHabilidad(h.idHabilidad)">
+                    {{ h.nombre }}
+                  </button>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Error -->
+        @if (mensajeError()) {
+          <div class="mensaje-error anim-slide-down">{{ mensajeError() }}</div>
+        }
+
+        <!-- Acciones -->
+        <div class="acciones">
+          <button type="button" class="btn btn-secundario" (click)="volver()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primario" [disabled]="guardando()">
+            @if (guardando()) {
+              Publicando...
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                   stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round"
+                      d="M12 4.5v15m7.5-7.5h-15" />
+              </svg>
+              Publicar proyecto
+            }
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </main>
+</div>

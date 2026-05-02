@@ -1,1 +1,126 @@
-<p>ver-propuestas works!</p>
+<app-header></app-header>
+
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+
+  <main class="contenido">
+
+    <div class="pagina-header">
+      <button class="btn-volver" (click)="volver()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5 3 12m0 0 7.5-7.5M3 12h18" />
+        </svg>
+        Mis proyectos
+      </button>
+      <div>
+        <h1>Propuestas recibidas</h1>
+        @if (proyecto()) {
+          <p class="subtitulo">{{ proyecto()!.titulo }}</p>
+        }
+      </div>
+    </div>
+
+    @if (mensajeExito()) {
+      <div class="mensaje-exito anim-slide-down">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+        {{ mensajeExito() }}
+      </div>
+    }
+
+    @if (mensajeError()) {
+      <div class="mensaje-error">{{ mensajeError() }}</div>
+    }
+
+    @if (cargando()) {
+      <div class="estado-vacio"><p>Cargando propuestas...</p></div>
+    } @else if (propuestas().length === 0) {
+      <div class="estado-vacio">
+        <div class="vacio-icono">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+               stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+          </svg>
+        </div>
+        <h3>Aún no hay propuestas</h3>
+        <p>Los freelancers aún no han enviado propuestas para este proyecto.</p>
+      </div>
+    } @else {
+      <div class="lista-propuestas">
+        @for (propuesta of propuestas(); track propuesta.idPropuesta) {
+          <div class="tarjeta-propuesta"
+               [class.propuesta-aceptada]="propuesta.estado === 'ACEPTADA'"
+               [class.propuesta-rechazada]="propuesta.estado === 'RECHAZADA'">
+
+            <div class="propuesta-header">
+              <div class="freelancer-info">
+                <div class="avatar">
+                  {{ propuesta.nombreFreelancer?.charAt(0)?.toUpperCase() }}
+                </div>
+                <div>
+                  <span class="nombre-freelancer">{{ propuesta.nombreFreelancer }}</span>
+                  <span class="fecha-envio">{{ formatearFecha(propuesta.fechaEnvio) }}</span>
+                </div>
+              </div>
+
+              <span class="badge-estado"
+                    [ngClass]="{
+                      'badge-pendiente': propuesta.estado === 'PENDIENTE',
+                      'badge-aceptada': propuesta.estado === 'ACEPTADA',
+                      'badge-rechazada': propuesta.estado === 'RECHAZADA'
+                    }">
+                {{ propuesta.estado === 'PENDIENTE' ? 'Pendiente' :
+                   propuesta.estado === 'ACEPTADA' ? 'Aceptada' : 'Rechazada' }}
+              </span>
+            </div>
+
+            <div class="propuesta-detalles">
+              <div class="detalle-item">
+                <span class="detalle-label">Monto ofertado</span>
+                <span class="detalle-valor monto">Q {{ propuesta.montoOfertado.toFixed(2) }}</span>
+              </div>
+              <div class="detalle-item">
+                <span class="detalle-label">Plazo</span>
+                <span class="detalle-valor">{{ propuesta.plazoDias }} días</span>
+              </div>
+            </div>
+
+            <div class="carta">
+              <p class="carta-label">Carta de presentación</p>
+              <p class="carta-texto">{{ propuesta.cartaPresentacion }}</p>
+            </div>
+
+            @if (propuesta.estado === 'PENDIENTE') {
+              <div class="propuesta-acciones">
+                <button class="btn-rechazar"
+                        [disabled]="procesando() === propuesta.idPropuesta"
+                        (click)="rechazar(propuesta)">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                       stroke-width="1.8" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+                  </svg>
+                  Rechazar
+                </button>
+                <button class="btn-aceptar"
+                        [disabled]="procesando() === propuesta.idPropuesta"
+                        (click)="aceptar(propuesta)">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+                       stroke-width="1.8" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+                  </svg>
+                  {{ procesando() === propuesta.idPropuesta ? 'Procesando...' : 'Aceptar propuesta' }}
+                </button>
+              </div>
+            }
+
+          </div>
+        }
+      </div>
+    }
+
+  </main>
+</div>

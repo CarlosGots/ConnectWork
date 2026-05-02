@@ -29,8 +29,48 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['CLIENTE'] }
   },
+  {
+    path: 'cliente/publicar',
+    loadComponent: () => import('./components/cliente/publicar-proyecto/publicar-proyecto.component').then(m => m.PublicarProyectoComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['CLIENTE'] }
+  },
+  {
+    path: 'cliente/mis-proyectos',
+    loadComponent: () => import('./components/cliente/mis-proyectos/mis-proyectos.component').then(m => m.MisProyectosComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['CLIENTE'] }
+  },
+
+  {
+    path: 'cliente/propuestas/:idProyecto',
+    loadComponent: () => import('./components/cliente/ver-propuestas/ver-propuestas.component').then(m => m.VerPropuestasComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['CLIENTE'] }
+  },
+  {
+    path: 'cliente/recargar',
+    loadComponent: () => import('./components/cliente/recargar-saldo/recargar-saldo.component').then(m => m.RecargarSaldoComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['CLIENTE'] }
+  },
 
   // Freelancer
+
+{
+    path: 'freelancer/explorar',
+    loadComponent: () => import('./components/freelancer/explorar-proyectos/explorar-proyectos.component').then(m => m.ExplorarProyectosComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['FREELANCER'] }
+  },
+  {
+    path: 'freelancer/propuestas',
+    loadComponent: () => import('./components/freelancer/mis-propuestas/mis-propuestas.component').then(m => m.MisPropuestasComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['FREELANCER'] }
+  },
+
+
   {
     path: 'freelancer',
     loadComponent: () => import('./components/freelancer/dashboard-freelancer/dashboard-freelancer.component').then(m => m.DashboardFreelancerComponent),
@@ -61,6 +101,12 @@ export const routes: Routes = [
   {
     path: 'admin/comision',
     loadComponent: () => import('./components/admin/cambiar-comision/cambiar-comision.component').then(m => m.CambiarComisionComponent),
+    canActivate: [authGuard, roleGuard],
+    data: { roles: ['ADMINISTRADOR'] }
+  },
+  {
+    path: 'admin/usuarios',
+    loadComponent: () => import('./components/admin/gestion-usuarios/gestion-usuarios.component').then(m => m.GestionUsuariosComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMINISTRADOR'] }
   },

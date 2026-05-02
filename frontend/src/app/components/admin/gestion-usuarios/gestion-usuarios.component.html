@@ -1,1 +1,146 @@
-<p>gestion-usuarios works!</p>
+<app-header></app-header>
+
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+
+  <main class="contenido">
+
+    <!-- Encabezado -->
+    <div class="pagina-header">
+      <div>
+        <h1>Usuarios</h1>
+        <p class="subtitulo">Gestiona las cuentas de clientes y freelancers</p>
+      </div>
+    </div>
+
+    <!-- Mensajes -->
+    @if (mensajeExito()) {
+      <div class="mensaje-exito anim-slide-down">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+             stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+        {{ mensajeExito() }}
+      </div>
+    }
+
+    @if (mensajeError()) {
+      <div class="mensaje-error anim-slide-down">{{ mensajeError() }}</div>
+    }
+
+    <!-- Métricas rápidas -->
+    <div class="metricas anim-stagger">
+      <div class="metrica-card">
+        <span class="metrica-numero">{{ totalActivos() }}</span>
+        <span class="metrica-label">Activos</span>
+      </div>
+      <div class="metrica-card">
+        <span class="metrica-numero">{{ totalClientes() }}</span>
+        <span class="metrica-label">Clientes</span>
+      </div>
+      <div class="metrica-card">
+        <span class="metrica-numero">{{ totalFreelancers() }}</span>
+        <span class="metrica-label">Freelancers</span>
+      </div>
+      <div class="metrica-card">
+        <span class="metrica-numero">{{ totalAdmins() }}</span>
+        <span class="metrica-label">Admins</span>
+      </div>
+    </div>
+
+    <!-- Filtros por rol -->
+    <div class="filtros">
+      @for (filtro of ['TODOS', 'CLIENTE', 'FREELANCER', 'ADMINISTRADOR']; track filtro) {
+        <button class="chip-filtro"
+                [class.chip-activo]="filtroRol() === filtro"
+                (click)="filtroRol.set(filtro)">
+          {{ filtro === 'TODOS' ? 'Todos' :
+             filtro === 'CLIENTE' ? 'Clientes' :
+             filtro === 'FREELANCER' ? 'Freelancers' : 'Admins' }}
+        </button>
+      }
+    </div>
+
+    <!-- Lista de usuarios -->
+    @if (cargando()) {
+      <div class="estado-vacio"><p>Cargando usuarios...</p></div>
+    } @else if (usuariosFiltrados().length === 0) {
+      <div class="estado-vacio"><p>No hay usuarios en esta categoría.</p></div>
+    } @else {
+      <div class="tabla-usuarios">
+
+        <!-- Encabezado de la tabla -->
+        <div class="tabla-header">
+          <span>Usuario</span>
+          <span>Rol</span>
+          <span>Saldo</span>
+          <span>Registro</span>
+          <span>Estado</span>
+          <span>Acción</span>
+        </div>
+
+        <!-- Filas de usuarios -->
+        @for (usuario of usuariosFiltrados(); track usuario.idUsuario) {
+          <div class="tabla-fila" [class.fila-inactiva]="!usuario.activo">
+
+            <!-- Usuario -->
+            <div class="col-usuario">
+              <div class="avatar-pequeno">
+                {{ usuario.nombreCompleto.charAt(0).toUpperCase() }}
+              </div>
+              <div class="usuario-info">
+                <span class="nombre">{{ usuario.nombreCompleto }}</span>
+                <span class="username">&#64;{{ usuario.username }}</span>
+              </div>
+            </div>
+
+            <!-- Rol -->
+            <div class="col-rol">
+              <span class="badge"
+                    [class.badge-cliente]="usuario.rol === 'CLIENTE'"
+                    [class.badge-freelancer]="usuario.rol === 'FREELANCER'"
+                    [class.badge-admin]="usuario.rol === 'ADMINISTRADOR'">
+                {{ etiquetaRol(usuario.rol) }}
+              </span>
+            </div>
+
+            <!-- Saldo -->
+            <div class="col-saldo">
+              Q {{ usuario.saldo.toFixed(2) }}
+            </div>
+
+            <!-- Fecha -->
+            <div class="col-fecha">
+              {{ formatearFecha(usuario.fechaCreacion) }}
+            </div>
+
+            <!-- Estado -->
+            <div class="col-estado">
+              @if (usuario.activo) {
+                <span class="badge badge-activo">Activo</span>
+              } @else {
+                <span class="badge badge-inactivo">Inactivo</span>
+              }
+            </div>
+
+            <!-- Acción -->
+            <div class="col-accion">
+              @if (usuario.rol !== 'ADMINISTRADOR') {
+                <button class="btn-toggle"
+                        [class.btn-desactivar]="usuario.activo"
+                        [class.btn-activar]="!usuario.activo"
+                        (click)="toggleEstado(usuario)">
+                  {{ usuario.activo ? 'Desactivar' : 'Activar' }}
+                </button>
+              } @else {
+                <span class="sin-accion">—</span>
+              }
+            </div>
+
+          </div>
+        }
+      </div>
+    }
+
+  </main>
+</div>

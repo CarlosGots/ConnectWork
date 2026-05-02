@@ -19,7 +19,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
-
+import com.connectwork.dao.UsuarioDAO;
+import com.connectwork.model.Usuario;
+import java.util.List;
 /**
  * Servlet que gestiona operaciones del usuario autenticado.
  * Endpoints:
@@ -30,21 +32,47 @@ public class UsuarioServlet extends HttpServlet {
 
     private final ClienteDAO clienteDAO = new ClienteDAO();
     private final FreelancerDAO freelancerDAO = new FreelancerDAO();
+    private final UsuarioDAO usuarioDAO = new UsuarioDAO();
     private final Gson gson = GsonUtil.getGson();
 
     @Override
-    protected void doPut(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
 
-        response.setContentType("application/json;charset=UTF-8");
-        String path = request.getPathInfo();
+    response.setContentType("application/json;charset=UTF-8");
 
-        if ("/info".equals(path)) {
-            completarInfo(request, response);
-        } else {
-            enviarError(response, 404, "Endpoint no encontrado: " + path);
-        }
+    String rol = (String) request.getAttribute("rol");
+    if (!"ADMINISTRADOR".equals(rol)) {
+        enviarError(response, 403, "Solo el administrador puede listar usuarios");
+        return;
     }
+
+    try {
+        List<Usuario> lista = usuarioDAO.listarTodos();
+        response.setStatus(HttpServletResponse.SC_OK);
+        try (PrintWriter out = response.getWriter()) {
+            out.print(gson.toJson(lista));
+        }
+    } catch (Exception e) {
+        enviarError(response, 500, "Error al listar usuarios: " + e.getMessage());
+    }
+}
+    
+   @Override
+protected void doPut(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+
+    response.setContentType("application/json;charset=UTF-8");
+    String path = request.getPathInfo();
+
+    if ("/info".equals(path)) {
+        completarInfo(request, response);
+    } else if (path != null && path.endsWith("/estado")) {
+        cambiarEstadoUsuario(request, response);
+    } else {
+        enviarError(response, 404, "Endpoint no encontrado: " + path);
+    }
+}
 
     /**
      * Recibe los datos iniciales del usuario y los guarda según su rol.
@@ -172,6 +200,45 @@ public class UsuarioServlet extends HttpServlet {
         }
         return sb.toString();
     }
+    
+    /**
+ * Activa o desactiva un usuario. Solo admin.
+ * PUT /usuarios/{id}/estado
+ */
+private void cambiarEstadoUsuario(HttpServletRequest request, HttpServletResponse response)
+        throws IOException {
+
+    String rolSolicitante = (String) request.getAttribute("rol");
+    if (!"ADMINISTRADOR".equals(rolSolicitante)) {
+        enviarError(response, 403, "Solo el administrador puede cambiar el estado de usuarios");
+        return;
+    }
+
+    try {
+        String path = request.getPathInfo();
+        String idStr = path.replace("/estado", "").replace("/", "");
+        int idUsuario = Integer.parseInt(idStr);
+
+        String json = leerBody(request);
+        JsonObject payload = gson.fromJson(json, JsonObject.class);
+        boolean activo = payload.get("activo").getAsBoolean();
+
+        boolean exito = usuarioDAO.cambiarEstado(idUsuario, activo);
+        if (!exito) {
+            enviarError(response, 500, "No se pudo cambiar el estado del usuario");
+            return;
+        }
+
+        JsonObject resp = new JsonObject();
+        resp.addProperty("mensaje", activo ? "Usuario activado" : "Usuario desactivado");
+        response.setStatus(HttpServletResponse.SC_OK);
+        try (PrintWriter out = response.getWriter()) {
+            out.print(gson.toJson(resp));
+        }
+    } catch (Exception e) {
+        enviarError(response, 500, "Error al cambiar estado: " + e.getMessage());
+    }
+}
 
     private void enviarError(HttpServletResponse response, int status, String mensaje) throws IOException {
         response.setStatus(status);
