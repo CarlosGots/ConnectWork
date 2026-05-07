@@ -4,11 +4,55 @@
   <app-menu-lateral></app-menu-lateral>
 
   <main class="contenido">
-    <h1>Dashboard del Cliente</h1>
-    <p class="bienvenida">Aquí va el resumen de tu actividad en ConnectWork.</p>
+    <h1>Mi panel</h1>
+    <p class="subtitulo">Resumen de tu actividad en ConnectWork</p>
 
-    <div class="placeholder">
-      <p>📊 Próximamente: saldo, proyectos activos y métricas.</p>
+    @if (data()) {
+      <div class="metricas">
+        <div class="metrica-card destaque">
+          <span class="metrica-valor monto">Q{{ data().saldo | number:'1.2-2' }}</span>
+          <span class="metrica-label">Saldo disponible</span>
+        </div>
+        <div class="metrica-card">
+          <span class="metrica-valor">{{ data().totalProyectos || 0 }}</span>
+          <span class="metrica-label">Proyectos publicados</span>
+        </div>
+        <div class="metrica-card">
+          <span class="metrica-valor monto">Q{{ data().totalGastado || 0 | number:'1.2-2' }}</span>
+          <span class="metrica-label">Total invertido</span>
+        </div>
+        <div class="metrica-card">
+          <span class="metrica-valor">{{ data().entregasPendientes || 0 }}</span>
+          <span class="metrica-label">Entregas por revisar</span>
+        </div>
+      </div>
+
+      @if (data().proyectosPorEstado) {
+  <div class="estados-card">
+    <h3>Proyectos por estado</h3>
+    <div class="estados-grid">
+      @for (key of estadoKeys(); track key) {
+        <div class="estado-item">
+          <span class="estado-badge estado-{{ key.toLowerCase() }}">{{ key }}</span>
+          <span class="estado-num">{{ data().proyectosPorEstado[key] }}</span>
+        </div>
+      }
     </div>
+  </div>
+}
+
+      <div class="accesos-rapidos">
+        <h3>Accesos rápidos</h3>
+        <div class="links">
+          <a routerLink="/cliente/publicar" class="link-rapido">Publicar proyecto</a>
+          <a routerLink="/cliente/mis-proyectos" class="link-rapido">Mis proyectos</a>
+          <a routerLink="/cliente/revisar-entrega" class="link-rapido">Revisar entregas</a>
+          <a routerLink="/cliente/recargar" class="link-rapido">Recargar saldo</a>
+          <a routerLink="/cliente/calificar" class="link-rapido">Calificar</a>
+        </div>
+      </div>
+    } @else {
+      <div class="cargando">Cargando métricas...</div>
+    }
   </main>
 </div>

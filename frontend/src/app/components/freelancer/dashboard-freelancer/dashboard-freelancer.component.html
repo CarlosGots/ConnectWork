@@ -4,11 +4,48 @@
   <app-menu-lateral></app-menu-lateral>
 
   <main class="contenido">
-    <h1>Dashboard del Freelancer</h1>
-    <p class="bienvenida">Aquí va el resumen de tu actividad como freelancer.</p>
+    <h1>Mi panel</h1>
+    <p class="subtitulo">Resumen de tu actividad como freelancer</p>
 
-    <div class="placeholder">
-      <p>🚀 Próximamente: saldo acumulado, contratos activos y propuestas pendientes.</p>
-    </div>
+    @if (data()) {
+      <div class="metricas">
+        <div class="metrica-card destaque">
+          <span class="metrica-valor monto">Q{{ data().saldo | number:'1.2-2' }}</span>
+          <span class="metrica-label">Saldo acumulado</span>
+        </div>
+        <div class="metrica-card">
+          <span class="metrica-valor monto">Q{{ data().totalGanado || 0 | number:'1.2-2' }}</span>
+          <span class="metrica-label">Total ganado</span>
+        </div>
+        <div class="metrica-card">
+          <span class="metrica-valor">{{ data().contratosActivos || 0 }}</span>
+          <span class="metrica-label">Contratos activos</span>
+        </div>
+        <div class="metrica-card">
+          <span class="metrica-valor">{{ data().contratosCompletados || 0 }}</span>
+          <span class="metrica-label">Completados</span>
+        </div>
+        <div class="metrica-card">
+          <span class="metrica-valor">{{ data().propuestasPendientes || 0 }}</span>
+          <span class="metrica-label">Propuestas pendientes</span>
+        </div>
+        <div class="metrica-card">
+          <span class="metrica-valor">{{ data().calificacionPromedio ? (data().calificacionPromedio | number:'1.1-1') + ' ⭐' : 'Sin calif.' }}</span>
+          <span class="metrica-label">Calificación promedio</span>
+        </div>
+      </div>
+
+      <div class="accesos-rapidos">
+        <h3>Accesos rápidos</h3>
+        <div class="links">
+          <a routerLink="/freelancer/explorar" class="link-rapido">Explorar proyectos</a>
+          <a routerLink="/freelancer/propuestas" class="link-rapido">Mis propuestas</a>
+          <a routerLink="/freelancer/contratos" class="link-rapido">Contratos activos</a>
+          <a routerLink="/freelancer/reportes" class="link-rapido">Reportes</a>
+        </div>
+      </div>
+    } @else {
+      <div class="cargando">Cargando métricas...</div>
+    }
   </main>
 </div>

@@ -47,4 +47,7 @@ export class PropuestaService {
   rechazar(idPropuesta: number): Observable<{ mensaje: string }> {
     return this.http.put<{ mensaje: string }>(`${this.API_URL}/${idPropuesta}/rechazar`, {});
   }
+  retirar(idPropuesta: number): Observable<{ mensaje: string }> {
+  return this.http.put<{ mensaje: string }>(`${this.API_URL}/${idPropuesta}/retirar`, {});
+}
 }

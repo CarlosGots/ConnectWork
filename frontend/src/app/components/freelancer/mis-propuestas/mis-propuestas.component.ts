@@ -62,4 +62,17 @@ export class MisPropuestasComponent implements OnInit {
       day: '2-digit', month: 'short', year: 'numeric'
     });
   }
+  retirarPropuesta(idPropuesta: number) {
+  if (!confirm('¿Retirar esta propuesta? Esta acción no se puede deshacer.')) return;
+
+  this.propuestaService.retirar(idPropuesta).subscribe({
+    next: () => {
+      this.cargarPropuestas();
+    },
+    error: (err: any) => {
+      this.mensajeError.set(err.error?.error || 'Error al retirar propuesta');
+      setTimeout(() => this.mensajeError.set(''), 3000);
+    }
+  });
+}
 }

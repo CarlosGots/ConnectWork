@@ -185,6 +185,25 @@ public class PropuestaServlet extends HttpServlet {
                 resp.addProperty("mensaje", "Propuesta rechazada.");
                 enviarOk(response, gson.toJson(resp));
 
+                
+                } else if (path != null && path.endsWith("/retirar")) {
+    if (!"FREELANCER".equals(rol)) {
+        enviarError(response, 403, "Solo freelancers pueden retirar propuestas"); return;
+    }
+    String idStr = path.replace("/retirar", "").replace("/", "");
+    int idPropuesta = Integer.parseInt(idStr);
+
+    boolean exito = propuestaDAO.retirar(idPropuesta, idUsuario);
+    if (!exito) {
+        enviarError(response, 400, "No se pudo retirar. Solo puedes retirar propuestas pendientes en proyectos abiertos.");
+        return;
+    }
+
+    JsonObject resp = new JsonObject();
+    resp.addProperty("mensaje", "Propuesta retirada exitosamente.");
+    enviarOk(response, gson.toJson(resp));
+                
+                
             } else {
                 enviarError(response, 404, "Endpoint no encontrado");
             }

@@ -80,10 +80,18 @@
               </div>
             </div>
 
-            @if (propuesta.cartaPresentacion) {
+           @if (propuesta.cartaPresentacion) {
               <div class="carta">
                 <span class="carta-label">CARTA DE PRESENTACIÓN</span>
                 <p>{{ propuesta.cartaPresentacion }}</p>
+              </div>
+            }
+
+            @if (propuesta.estado === 'PENDIENTE') {
+              <div class="propuesta-acciones">
+                <button class="btn-retirar" (click)="retirarPropuesta(propuesta.idPropuesta)">
+                  Retirar propuesta
+                </button>
               </div>
             }
           </div>

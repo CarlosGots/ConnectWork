@@ -154,7 +154,21 @@ protected void doGet(HttpServletRequest request, HttpServletResponse response)
                 JsonObject resp = new JsonObject();
                 resp.addProperty("mensaje", "Entrega rechazada. El freelancer puede subir una nueva.");
                 enviarOk(response, gson.toJson(resp));
+} else if (path != null && path.endsWith("/cancelar-contrato")) {
+    if (!"CLIENTE".equals(rol)) {
+        enviarError(response, 403, "Solo clientes pueden cancelar contratos"); return;
+    }
+    int idContrato = Integer.parseInt(path.replace("/cancelar-contrato", "").replace("/", ""));
+    String json = leerBody(request);
+    JsonObject payload = gson.fromJson(json, JsonObject.class);
+    String motivo = payload.has("motivo") ? payload.get("motivo").getAsString() : "Sin motivo especificado";
 
+    boolean exito = entregaDAO.cancelarContrato(idContrato, idCliente, motivo);
+    if (!exito) { enviarError(response, 400, "No se pudo cancelar el contrato"); return; }
+
+    JsonObject resp = new JsonObject();
+    resp.addProperty("mensaje", "Contrato cancelado. El monto ha sido devuelto a tu saldo.");
+    enviarOk(response, gson.toJson(resp));
             } else {
                 enviarError(response, 404, "Endpoint no encontrado");
             }

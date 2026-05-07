@@ -40,4 +40,7 @@ obtenerEntregasContrato(idContrato: number): Observable<Entrega[]> {
 obtenerMisEntregas(): Observable<any[]> {
   return this.http.get<any[]>(`${this.API_URL}/mis-entregas`);
 }
+cancelarContrato(idContrato: number, motivo: string): Observable<any> {
+  return this.http.put<any>(`${this.API_URL}/${idContrato}/cancelar-contrato`, { motivo });
+}
 }

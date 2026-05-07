@@ -394,4 +394,188 @@ public class ReporteDAO {
         }
         return 0;
     }
+    
+    // ==================== DASHBOARDS ====================
+
+public Map<String, Object> dashboardAdmin() {
+    Map<String, Object> data = new LinkedHashMap<>();
+    Connection con = null;
+    try {
+        con = ConexionBD.obtenerConexion();
+
+        // Total usuarios por rol
+        try (PreparedStatement ps = con.prepareStatement(
+                "SELECT rol, COUNT(*) AS total FROM usuarios GROUP BY rol")) {
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    data.put("total" + rs.getString("rol").substring(0,1) + rs.getString("rol").substring(1).toLowerCase(), rs.getInt("total"));
+                }
+            }
+        }
+
+        // Total proyectos
+        try (PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) AS total FROM proyectos")) {
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("totalProyectos", rs.getInt("total")); }
+        }
+
+        // Contratos completados
+        try (PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) AS total FROM contratos WHERE estado = 'COMPLETADO'")) {
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("contratosCompletados", rs.getInt("total")); }
+        }
+
+        // Contratos activos
+        try (PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) AS total FROM contratos WHERE estado = 'ACTIVO'")) {
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("contratosActivos", rs.getInt("total")); }
+        }
+
+        // Saldo plataforma
+        try (PreparedStatement ps = con.prepareStatement("SELECT saldo_actual FROM saldo_plataforma LIMIT 1")) {
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("saldoPlataforma", rs.getDouble("saldo_actual")); }
+        }
+
+        // Comisión vigente
+        try (PreparedStatement ps = con.prepareStatement("SELECT porcentaje FROM configuracion_comision WHERE activa = 1 LIMIT 1")) {
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("comisionVigente", rs.getDouble("porcentaje")); }
+        }
+
+        // Solicitudes pendientes
+        int solPendientes = 0;
+        try (PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) AS total FROM solicitudes_categoria WHERE estado = 'PENDIENTE'")) {
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) solPendientes += rs.getInt("total"); }
+        }
+        try (PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) AS total FROM solicitudes_habilidad WHERE estado = 'PENDIENTE'")) {
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) solPendientes += rs.getInt("total"); }
+        }
+        data.put("solicitudesPendientes", solPendientes);
+
+    } catch (SQLException e) {
+        System.err.println("Error dashboard admin: " + e.getMessage());
+    } finally {
+        ConexionBD.cerrarConexion(con);
+    }
+    return data;
+}
+
+public Map<String, Object> dashboardCliente(int idCliente) {
+    Map<String, Object> data = new LinkedHashMap<>();
+    Connection con = null;
+    try {
+        con = ConexionBD.obtenerConexion();
+
+        // Saldo
+        try (PreparedStatement ps = con.prepareStatement("SELECT saldo FROM usuarios WHERE id_usuario = ?")) {
+            ps.setInt(1, idCliente);
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("saldo", rs.getDouble("saldo")); }
+        }
+
+        // Proyectos por estado
+        try (PreparedStatement ps = con.prepareStatement(
+                "SELECT estado, COUNT(*) AS total FROM proyectos WHERE id_cliente = ? GROUP BY estado")) {
+            ps.setInt(1, idCliente);
+            Map<String, Integer> estados = new LinkedHashMap<>();
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) estados.put(rs.getString("estado"), rs.getInt("total"));
+            }
+            data.put("proyectosPorEstado", estados);
+        }
+
+        // Total proyectos
+        try (PreparedStatement ps = con.prepareStatement("SELECT COUNT(*) AS total FROM proyectos WHERE id_cliente = ?")) {
+            ps.setInt(1, idCliente);
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("totalProyectos", rs.getInt("total")); }
+        }
+
+        // Total gastado
+        try (PreparedStatement ps = con.prepareStatement(
+                "SELECT COALESCE(SUM(c.monto_bloqueado), 0) AS total FROM contratos c "
+                + "INNER JOIN propuestas p ON c.id_propuesta = p.id_propuesta "
+                + "INNER JOIN proyectos pr ON p.id_proyecto = pr.id_proyecto "
+                + "WHERE pr.id_cliente = ? AND c.estado = 'COMPLETADO'")) {
+            ps.setInt(1, idCliente);
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("totalGastado", rs.getDouble("total")); }
+        }
+
+        // Entregas pendientes de revisión
+        try (PreparedStatement ps = con.prepareStatement(
+                "SELECT COUNT(*) AS total FROM entregas e "
+                + "INNER JOIN contratos c ON e.id_contrato = c.id_contrato "
+                + "INNER JOIN propuestas p ON c.id_propuesta = p.id_propuesta "
+                + "INNER JOIN proyectos pr ON p.id_proyecto = pr.id_proyecto "
+                + "WHERE pr.id_cliente = ? AND e.estado = 'PENDIENTE'")) {
+            ps.setInt(1, idCliente);
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("entregasPendientes", rs.getInt("total")); }
+        }
+
+    } catch (SQLException e) {
+        System.err.println("Error dashboard cliente: " + e.getMessage());
+    } finally {
+        ConexionBD.cerrarConexion(con);
+    }
+    return data;
+}
+
+public Map<String, Object> dashboardFreelancer(int idFreelancer) {
+    Map<String, Object> data = new LinkedHashMap<>();
+    Connection con = null;
+    try {
+        con = ConexionBD.obtenerConexion();
+
+        // Saldo
+        try (PreparedStatement ps = con.prepareStatement("SELECT saldo FROM usuarios WHERE id_usuario = ?")) {
+            ps.setInt(1, idFreelancer);
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("saldo", rs.getDouble("saldo")); }
+        }
+
+        // Contratos activos
+        try (PreparedStatement ps = con.prepareStatement(
+                "SELECT COUNT(*) AS total FROM contratos c "
+                + "INNER JOIN propuestas p ON c.id_propuesta = p.id_propuesta "
+                + "WHERE p.id_freelancer = ? AND c.estado = 'ACTIVO'")) {
+            ps.setInt(1, idFreelancer);
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("contratosActivos", rs.getInt("total")); }
+        }
+
+        // Contratos completados
+        try (PreparedStatement ps = con.prepareStatement(
+                "SELECT COUNT(*) AS total FROM contratos c "
+                + "INNER JOIN propuestas p ON c.id_propuesta = p.id_propuesta "
+                + "WHERE p.id_freelancer = ? AND c.estado = 'COMPLETADO'")) {
+            ps.setInt(1, idFreelancer);
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("contratosCompletados", rs.getInt("total")); }
+        }
+
+        // Propuestas pendientes
+        try (PreparedStatement ps = con.prepareStatement(
+                "SELECT COUNT(*) AS total FROM propuestas WHERE id_freelancer = ? AND estado = 'PENDIENTE'")) {
+            ps.setInt(1, idFreelancer);
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("propuestasPendientes", rs.getInt("total")); }
+        }
+
+        // Total ganado
+        try (PreparedStatement ps = con.prepareStatement(
+                "SELECT COALESCE(SUM(c.monto_bloqueado - (c.monto_bloqueado * c.porcentaje_comision / 100)), 0) AS total "
+                + "FROM contratos c INNER JOIN propuestas p ON c.id_propuesta = p.id_propuesta "
+                + "WHERE p.id_freelancer = ? AND c.estado = 'COMPLETADO'")) {
+            ps.setInt(1, idFreelancer);
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("totalGanado", rs.getDouble("total")); }
+        }
+
+        // Calificación promedio
+        try (PreparedStatement ps = con.prepareStatement(
+                "SELECT AVG(cal.estrellas) AS promedio FROM calificaciones cal "
+                + "INNER JOIN contratos c ON cal.id_contrato = c.id_contrato "
+                + "INNER JOIN propuestas p ON c.id_propuesta = p.id_propuesta "
+                + "WHERE p.id_freelancer = ?")) {
+            ps.setInt(1, idFreelancer);
+            try (ResultSet rs = ps.executeQuery()) { if (rs.next()) data.put("calificacionPromedio", rs.getDouble("promedio")); }
+        }
+
+    } catch (SQLException e) {
+        System.err.println("Error dashboard freelancer: " + e.getMessage());
+    } finally {
+        ConexionBD.cerrarConexion(con);
+    }
+    return data;
+}
+    
 }

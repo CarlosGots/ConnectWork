@@ -84,13 +84,13 @@ public class EntregaDAO {
      * Aprueba una entrega: libera el pago al freelancer y completa el contrato.
      */
     public boolean aprobar(int idEntrega, int idCliente) {
-        String sqlObtener = "SELECT e.id_contrato, c.monto_bloqueado, c.porcentaje_comision, "
-                          + "p.id_freelancer "
-                          + "FROM entregas e "
-                          + "INNER JOIN contratos c ON e.id_contrato = c.id_contrato "
-                          + "INNER JOIN propuestas p ON c.id_propuesta = p.id_propuesta "
-                          + "INNER JOIN proyectos pr ON p.id_proyecto = pr.id_proyecto "
-                          + "WHERE e.id_entrega = ? AND pr.id_cliente = ? AND e.estado = 'PENDIENTE'";
+       String sqlObtener = "SELECT e.id_contrato, c.monto_bloqueado, c.porcentaje_comision, "
+                  + "p.id_freelancer "
+                  + "FROM entregas e "
+                  + "INNER JOIN contratos c ON e.id_contrato = c.id_contrato "
+                  + "INNER JOIN propuestas p ON c.id_propuesta = p.id_propuesta "
+                  + "INNER JOIN proyectos pr ON p.id_proyecto = pr.id_proyecto "
+                  + "WHERE e.id_entrega = ? AND pr.id_cliente = ? AND e.estado = 'PENDIENTE' AND c.estado = 'ACTIVO'";
         String sqlEntrega   = "UPDATE entregas SET estado = 'APROBADA', fecha_revision = NOW() WHERE id_entrega = ?";
         String sqlContrato  = "UPDATE contratos SET estado = 'COMPLETADO', fecha_cierre = NOW() WHERE id_contrato = ?";
         String sqlProyecto  = "UPDATE proyectos p "
@@ -340,4 +340,70 @@ public java.util.List<java.util.Map<String, Object>> entregasPendientesCliente(i
     }
     return lista;
 }
+
+/**
+ * Cancela un contrato activo. Devuelve el monto bloqueado al cliente.
+ */
+public boolean cancelarContrato(int idContrato, int idCliente, String motivo) {
+    String sqlVerificar = "SELECT c.id_contrato, c.monto_bloqueado, pr.id_cliente "
+            + "FROM contratos c "
+            + "INNER JOIN propuestas p ON c.id_propuesta = p.id_propuesta "
+            + "INNER JOIN proyectos pr ON p.id_proyecto = pr.id_proyecto "
+            + "WHERE c.id_contrato = ? AND pr.id_cliente = ? AND c.estado = 'ACTIVO'";
+    String sqlContrato = "UPDATE contratos SET estado = 'CANCELADO', fecha_cierre = NOW(), motivo_cancelacion = ? WHERE id_contrato = ?";
+    String sqlProyecto = "UPDATE proyectos p "
+            + "INNER JOIN propuestas pr ON pr.id_proyecto = p.id_proyecto "
+            + "INNER JOIN contratos c ON c.id_propuesta = pr.id_propuesta "
+            + "SET p.estado = 'CANCELADO' WHERE c.id_contrato = ?";
+    String sqlDevolver = "UPDATE usuarios SET saldo = saldo + ? WHERE id_usuario = ?";
+
+    Connection con = null;
+    try {
+        con = ConexionBD.obtenerConexion();
+        con.setAutoCommit(false);
+
+        double montoBloqueado;
+        try (PreparedStatement ps = con.prepareStatement(sqlVerificar)) {
+            ps.setInt(1, idContrato);
+            ps.setInt(2, idCliente);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next()) { con.rollback(); return false; }
+                montoBloqueado = rs.getDouble("monto_bloqueado");
+            }
+        }
+
+        // Cancelar contrato
+        try (PreparedStatement ps = con.prepareStatement(sqlContrato)) {
+            ps.setString(1, motivo);
+            ps.setInt(2, idContrato);
+            ps.executeUpdate();
+        }
+
+        // Cancelar proyecto
+        try (PreparedStatement ps = con.prepareStatement(sqlProyecto)) {
+            ps.setInt(1, idContrato);
+            ps.executeUpdate();
+        }
+
+        // Devolver saldo al cliente
+        try (PreparedStatement ps = con.prepareStatement(sqlDevolver)) {
+            ps.setDouble(1, montoBloqueado);
+            ps.setInt(2, idCliente);
+            ps.executeUpdate();
+        }
+
+        con.commit();
+        return true;
+
+    } catch (SQLException e) {
+        System.err.println("Error al cancelar contrato: " + e.getMessage());
+        try { if (con != null) con.rollback(); } catch (SQLException ignored) {}
+        return false;
+    } finally {
+        try { if (con != null) con.setAutoCommit(true); } catch (SQLException ignored) {}
+        ConexionBD.cerrarConexion(con);
+    }
+}
+
+
 }

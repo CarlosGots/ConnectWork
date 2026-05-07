@@ -46,4 +46,13 @@ export class ReporteService {
   reportePropuestas(fi: string, ff: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.API_URL}/freelancer/propuestas?fechaInicio=${fi}&fechaFin=${ff}`);
   }
+  dashboardAdmin(): Observable<any> {
+  return this.http.get<any>(`${this.API_URL}/dashboard/admin`);
+}
+dashboardCliente(): Observable<any> {
+  return this.http.get<any>(`${this.API_URL}/dashboard/cliente`);
+}
+dashboardFreelancer(): Observable<any> {
+  return this.http.get<any>(`${this.API_URL}/dashboard/freelancer`);
+}
 }

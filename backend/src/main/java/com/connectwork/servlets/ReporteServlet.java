@@ -87,7 +87,20 @@ public class ReporteServlet extends HttpServlet {
                 if (fi == null || ff == null) { enviarError(response, 400, "Fechas requeridas"); return; }
                 enviarOk(response, gson.toJson(reporteDAO.reportePropuestasFreelancer(idUsuario, fi, ff)));
 
-            } else {
+            } else if (path.equals("/dashboard/admin")) {
+    if (!"ADMINISTRADOR".equals(rol)) { enviarError(response, 403, "Sin permisos"); return; }
+    enviarOk(response, gson.toJson(reporteDAO.dashboardAdmin()));
+
+} else if (path.equals("/dashboard/cliente")) {
+    if (!"CLIENTE".equals(rol)) { enviarError(response, 403, "Sin permisos"); return; }
+    enviarOk(response, gson.toJson(reporteDAO.dashboardCliente(idUsuario)));
+
+} else if (path.equals("/dashboard/freelancer")) {
+    if (!"FREELANCER".equals(rol)) { enviarError(response, 403, "Sin permisos"); return; }
+    enviarOk(response, gson.toJson(reporteDAO.dashboardFreelancer(idUsuario)));
+         
+            
+           } else {
                 enviarError(response, 404, "Reporte no encontrado");
             }
         } catch (Exception e) {

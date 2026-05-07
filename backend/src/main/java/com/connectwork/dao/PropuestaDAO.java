@@ -266,4 +266,29 @@ public class PropuestaDAO {
         try { p.setTituloProyecto(rs.getString("titulo_proyecto")); } catch (SQLException ignored) {}
         return p;
     }
+    
+    /**
+ * Retira una propuesta del freelancer (solo si el proyecto está ABIERTO).
+ */
+public boolean retirar(int idPropuesta, int idFreelancer) {
+    String sql = "UPDATE propuestas p "
+               + "INNER JOIN proyectos pr ON p.id_proyecto = pr.id_proyecto "
+               + "SET p.estado = 'RETIRADA' "
+               + "WHERE p.id_propuesta = ? AND p.id_freelancer = ? "
+               + "AND p.estado = 'PENDIENTE' AND pr.estado = 'ABIERTO'";
+    Connection con = null;
+    try {
+        con = ConexionBD.obtenerConexion();
+        try (PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, idPropuesta);
+            ps.setInt(2, idFreelancer);
+            return ps.executeUpdate() > 0;
+        }
+    } catch (SQLException e) {
+        System.err.println("Error al retirar propuesta: " + e.getMessage());
+    } finally {
+        ConexionBD.cerrarConexion(con);
+    }
+    return false;
+}
 }

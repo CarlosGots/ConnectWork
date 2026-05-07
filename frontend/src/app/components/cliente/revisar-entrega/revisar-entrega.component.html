@@ -78,6 +78,11 @@
 
             @if (entrega.estado === 'PENDIENTE') {
               <div class="entrega-acciones">
+                <button class="btn-cancelar-contrato"
+                        [disabled]="procesando() === entrega.idEntrega"
+                        (click)="abrirModalCancelar(entrega.idContrato)">
+                  Cancelar contrato
+                </button>
                 <button class="btn-rechazar"
                         [disabled]="procesando() === entrega.idEntrega"
                         (click)="abrirModalRechazo(entrega.idEntrega)">
@@ -122,6 +127,36 @@
         <div class="modal-acciones">
           <button class="btn btn-secundario" (click)="modalRechazo.set(false)">Cancelar</button>
           <button class="btn btn-primario" (click)="confirmarRechazo()">Confirmar rechazo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalCancelar()) {
+  <div class="modal-overlay" (click)="modalCancelar.set(false)">
+    <div class="modal-card anim-scale" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Cancelar contrato</h2>
+        <button class="btn-cerrar-modal" (click)="modalCancelar.set(false)">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-form">
+        <p class="aviso-cancelar">El monto bloqueado será devuelto a tu saldo. Esta acción no se puede deshacer.</p>
+        <div class="campo">
+          <label>¿Por qué deseas cancelar este contrato?</label>
+          <textarea
+            [ngModel]="motivoCancelacion()"
+            (ngModelChange)="motivoCancelacion.set($event)"
+            placeholder="Indica el motivo de la cancelación..."
+            rows="4"></textarea>
+        </div>
+        <div class="modal-acciones">
+          <button class="btn btn-secundario" (click)="modalCancelar.set(false)">Volver</button>
+          <button class="btn-cancelar-confirmar" (click)="confirmarCancelacion()">Confirmar cancelación</button>
         </div>
       </div>
     </div>

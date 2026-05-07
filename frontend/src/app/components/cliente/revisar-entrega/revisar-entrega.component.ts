@@ -23,7 +23,9 @@ export class RevisarEntregaComponent implements OnInit {
   mensajeExito = signal<string>('');
   mensajeError = signal<string>('');
   procesando = signal<number | null>(null);
-
+modalCancelar = signal(false);
+idContratoCancelar = signal<number | null>(null);
+motivoCancelacion = signal('');
   // Modal de rechazo
   modalRechazo = signal<boolean>(false);
   idEntregaRechazar = signal<number | null>(null);
@@ -34,27 +36,17 @@ export class RevisarEntregaComponent implements OnInit {
   }
 
   cargarEntregas(): void {
-    this.cargando.set(true);
-    // Buscar el contrato activo del cliente via proyectos EN_PROGRESO o ENTREGA_PENDIENTE
-    this.http.get<any[]>('http://localhost:8080/connectwork-backend/proyectos/mis').subscribe({
-      next: (proyectos) => {
-        const activos = proyectos.filter(p =>
-          p.estado === 'EN_PROGRESO' || p.estado === 'ENTREGA_PENDIENTE'
-        );
-        if (activos.length === 0) {
-          this.cargando.set(false);
-          return;
-        }
-        // Cargar entregas del primer contrato activo
-        // Usamos el endpoint de entregas directamente
-        this.http.get<any[]>(`http://localhost:8080/connectwork-backend/entregas/contrato`).subscribe({
-          next: (lista) => { this.entregas.set(lista); this.cargando.set(false); },
-          error: () => { this.cargando.set(false); }
-        });
-      },
-      error: () => { this.cargando.set(false); }
-    });
-  }
+  this.cargando.set(true);
+  this.entregaService.obtenerMisEntregas().subscribe({
+    next: (lista) => {
+      this.entregas.set(lista);
+      this.cargando.set(false);
+    },
+    error: () => {
+      this.cargando.set(false);
+    }
+  });
+}
 
   aprobar(idEntrega: number): void {
     if (!confirm('¿Aprobar esta entrega? Se liberará el pago al freelancer.')) return;
@@ -115,6 +107,34 @@ export class RevisarEntregaComponent implements OnInit {
   if (!fecha) return '—';
   return new Date(fecha).toLocaleDateString('es-GT', {
     day: '2-digit', month: 'short', year: 'numeric'
+  });
+}
+// Agregar estos métodos
+abrirModalCancelar(idContrato: number) {
+  this.idContratoCancelar.set(idContrato);
+  this.motivoCancelacion.set('');
+  this.modalCancelar.set(true);
+}
+
+confirmarCancelacion() {
+  if (!this.motivoCancelacion().trim()) {
+    this.mensajeError.set('El motivo de cancelación es obligatorio.');
+    setTimeout(() => this.mensajeError.set(''), 3000);
+    return;
+  }
+
+  const id = this.idContratoCancelar()!;
+  this.modalCancelar.set(false);
+
+  this.entregaService.cancelarContrato(id, this.motivoCancelacion()).subscribe({
+    next: () => {
+      this.mostrarExito('Contrato cancelado. El monto ha sido devuelto a tu saldo.');
+      this.cargarEntregas();
+    },
+    error: (err: any) => {
+      this.mensajeError.set(err.error?.error || 'No se pudo cancelar el contrato.');
+      setTimeout(() => this.mensajeError.set(''), 3000);
+    }
   });
 }
 }

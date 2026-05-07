@@ -5,10 +5,59 @@
 
   <main class="contenido">
     <h1>Panel del Administrador</h1>
-    <p class="bienvenida">Gestión general de la plataforma ConnectWork.</p>
+    <p class="subtitulo">Gestión general de la plataforma ConnectWork</p>
 
-    <div class="placeholder">
-      <p>⚙️ Próximamente: métricas globales, comisión vigente y accesos rápidos.</p>
-    </div>
+    @if (data()) {
+      <div class="metricas">
+        <div class="metrica-card">
+          <span class="metrica-valor">{{ data().totalCliente || 0 }}</span>
+          <span class="metrica-label">Clientes</span>
+        </div>
+        <div class="metrica-card">
+          <span class="metrica-valor">{{ data().totalFreelancer || 0 }}</span>
+          <span class="metrica-label">Freelancers</span>
+        </div>
+        <div class="metrica-card">
+          <span class="metrica-valor">{{ data().totalProyectos || 0 }}</span>
+          <span class="metrica-label">Proyectos</span>
+        </div>
+        <div class="metrica-card">
+          <span class="metrica-valor">{{ data().contratosActivos || 0 }}</span>
+          <span class="metrica-label">Contratos activos</span>
+        </div>
+        <div class="metrica-card">
+          <span class="metrica-valor">{{ data().contratosCompletados || 0 }}</span>
+          <span class="metrica-label">Completados</span>
+        </div>
+        <div class="metrica-card destaque">
+          <span class="metrica-valor monto">Q{{ data().saldoPlataforma || 0 | number:'1.2-2' }}</span>
+          <span class="metrica-label">Saldo plataforma</span>
+        </div>
+      </div>
+
+      <div class="info-extra">
+        <div class="info-card">
+          <span class="info-label">Comisión vigente</span>
+          <span class="info-valor">{{ data().comisionVigente || 0 }}%</span>
+        </div>
+        <div class="info-card">
+          <span class="info-label">Solicitudes pendientes</span>
+          <span class="info-valor">{{ data().solicitudesPendientes || 0 }}</span>
+        </div>
+      </div>
+
+      <div class="accesos-rapidos">
+        <h3>Accesos rápidos</h3>
+        <div class="links">
+          <a routerLink="/admin/usuarios" class="link-rapido">Gestionar usuarios</a>
+          <a routerLink="/admin/categorias" class="link-rapido">Categorías</a>
+          <a routerLink="/admin/solicitudes" class="link-rapido">Solicitudes</a>
+          <a routerLink="/admin/comision" class="link-rapido">Comisión</a>
+          <a routerLink="/admin/reportes" class="link-rapido">Reportes</a>
+        </div>
+      </div>
+    } @else {
+      <div class="cargando">Cargando métricas...</div>
+    }
   </main>
 </div>
