@@ -1,1 +1,74 @@
-<p>recargar-saldo works!</p>
+<app-header></app-header>
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+  <main class="contenido">
+
+    <div class="pagina-header">
+      <div>
+        <h1>Recargar saldo</h1>
+        <p class="subtitulo">Agrega fondos a tu cuenta para contratar freelancers</p>
+      </div>
+    </div>
+
+    @if (mensajeExito()) {
+      <div class="mensaje-exito anim-slide-down">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+        {{ mensajeExito() }}
+      </div>
+    }
+
+    <div class="grid-recarga">
+
+      <!-- Saldo actual -->
+      <div class="card-saldo">
+        <p class="saldo-label">Saldo disponible</p>
+        @if (saldoActual() !== null) {
+          <p class="saldo-monto">Q {{ saldoActual()!.toFixed(2) }}</p>
+        } @else {
+          <p class="saldo-monto">Cargando...</p>
+        }
+      </div>
+
+      <!-- Formulario de recarga -->
+      <div class="card-form">
+        <h2>Nueva recarga</h2>
+
+        <div class="montos-rapidos">
+          <p class="label-rapidos">Montos rápidos:</p>
+          <div class="chips-montos">
+            @for (m of [100, 250, 500, 1000, 2000]; track m) {
+              <button class="chip-monto" (click)="monto.set(m)">Q {{ m }}</button>
+            }
+          </div>
+        </div>
+
+        <div class="campo">
+          <label for="monto">O ingresa el monto exacto</label>
+          <div class="input-simbolo">
+            <span>Q</span>
+            <input type="number"
+                   id="monto"
+                   [ngModel]="monto()"
+                   (ngModelChange)="monto.set($event)"
+                   name="monto"
+                   placeholder="0.00"
+                   min="1" step="0.01">
+          </div>
+        </div>
+
+        @if (mensajeError()) {
+          <div class="mensaje-error">{{ mensajeError() }}</div>
+        }
+
+        <button class="btn btn-primario btn-full" (click)="recargar()" [disabled]="cargando()">
+          @if (cargando()) { Procesando... } @else { Recargar saldo }
+        </button>
+
+        <p class="nota">⚠️ Simulación de pago. En producción se integraría con una pasarela real.</p>
+      </div>
+
+    </div>
+  </main>
+</div>

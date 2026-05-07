@@ -1,1 +1,94 @@
-<p>mis-propuestas works!</p>
+<app-header></app-header>
+
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+
+  <main class="contenido">
+    <div class="pagina-header">
+      <div>
+        <h1>Mis propuestas</h1>
+        <p class="subtitulo">Historial de propuestas enviadas a proyectos</p>
+      </div>
+    </div>
+
+    @if (mensajeError()) {
+      <div class="mensaje-error">{{ mensajeError() }}</div>
+    }
+
+    <!-- Filtros -->
+    @if (!cargando() && propuestas().length > 0) {
+      <div class="filtros">
+        <button class="filtro-btn" [class.activo]="filtroEstado() === 'TODOS'" (click)="setFiltro('TODOS')">
+          Todas <span class="conteo">{{ contarPorEstado('TODOS') }}</span>
+        </button>
+        <button class="filtro-btn" [class.activo]="filtroEstado() === 'PENDIENTE'" (click)="setFiltro('PENDIENTE')">
+          Pendientes <span class="conteo">{{ contarPorEstado('PENDIENTE') }}</span>
+        </button>
+        <button class="filtro-btn" [class.activo]="filtroEstado() === 'ACEPTADA'" (click)="setFiltro('ACEPTADA')">
+          Aceptadas <span class="conteo">{{ contarPorEstado('ACEPTADA') }}</span>
+        </button>
+        <button class="filtro-btn" [class.activo]="filtroEstado() === 'RECHAZADA'" (click)="setFiltro('RECHAZADA')">
+          Rechazadas <span class="conteo">{{ contarPorEstado('RECHAZADA') }}</span>
+        </button>
+      </div>
+    }
+
+    @if (cargando()) {
+      <div class="estado-vacio"><p>Cargando propuestas...</p></div>
+    } @else if (propuestas().length === 0) {
+      <div class="estado-vacio">
+        <div class="vacio-icono">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z" />
+          </svg>
+        </div>
+        <h3>Sin propuestas enviadas</h3>
+        <p>Explora proyectos disponibles y envía tu primera propuesta.</p>
+        <a routerLink="/freelancer/explorar" class="btn-explorar">Explorar proyectos</a>
+      </div>
+    } @else if (propuestasFiltradas().length === 0) {
+      <div class="estado-vacio">
+        <p>No tienes propuestas con estado "{{ filtroEstado() }}"</p>
+      </div>
+    } @else {
+      <div class="lista-propuestas">
+        @for (propuesta of propuestasFiltradas(); track propuesta.idPropuesta) {
+          <div class="propuesta-card anim-scale">
+            <div class="propuesta-header">
+              <h3>{{ propuesta.tituloProyecto || 'Proyecto #' + propuesta.idProyecto }}</h3>
+              <span class="badge"
+                    [class.badge-pendiente]="propuesta.estado === 'PENDIENTE'"
+                    [class.badge-aceptada]="propuesta.estado === 'ACEPTADA'"
+                    [class.badge-rechazada]="propuesta.estado === 'RECHAZADA'"
+                    [class.badge-retirada]="propuesta.estado === 'RETIRADA'">
+                {{ propuesta.estado }}
+              </span>
+            </div>
+
+            <div class="propuesta-detalles">
+              <div class="detalle">
+                <span class="detalle-label">MONTO OFERTADO</span>
+                <span class="detalle-valor monto">Q{{ propuesta.montoOfertado | number:'1.2-2' }}</span>
+              </div>
+              <div class="detalle">
+                <span class="detalle-label">PLAZO</span>
+                <span class="detalle-valor">{{ propuesta.plazoDias }} días</span>
+              </div>
+              <div class="detalle">
+                <span class="detalle-label">ENVIADA</span>
+                <span class="detalle-valor">{{ formatearFecha(propuesta.fechaEnvio) }}</span>
+              </div>
+            </div>
+
+            @if (propuesta.cartaPresentacion) {
+              <div class="carta">
+                <span class="carta-label">CARTA DE PRESENTACIÓN</span>
+                <p>{{ propuesta.cartaPresentacion }}</p>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </main>
+</div>

@@ -1,15 +1,20 @@
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\dao\FreelancerDAO.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\model\Propuesta.java
+C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\dao\SolicitudDAO.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\dao\ProyectoDAO.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\servlets\SaldoServlet.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\dao\ComisionDAO.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\util\JWTUtil.java
+C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\dao\ReporteDAO.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\model\Comision.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\servlets\CategoriaServlet.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\util\PasswordUtil.java
+C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\servlets\SolicitudServlet.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\model\Proyecto.java
+C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\servlets\EntregaServlet.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\util\ConexionBD.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\servlets\TestServlet.java
+C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\dao\CalificacionDAO.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\dao\UsuarioDAO.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\servlets\PropuestaServlet.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\util\CorsFilter.java
@@ -20,7 +25,10 @@ C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\servl
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\dao\RecargaDAO.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\util\JWTFilter.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\servlets\HabilidadServlet.java
+C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\servlets\CalificacionServlet.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\dao\CategoriaDAO.java
+C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\servlets\ReporteServlet.java
+C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\dao\EntregaDAO.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\model\Habilidad.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\model\Usuario.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\dao\HabilidadDAO.java
@@ -28,3 +36,4 @@ C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\servl
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\dao\PropuestaDAO.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\model\Categoria.java
 C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\dao\ClienteDAO.java
+C:\Users\carlo\Documents\ConnectWork\backend\src\main\java\com\connectwork\model\Calificacion.java

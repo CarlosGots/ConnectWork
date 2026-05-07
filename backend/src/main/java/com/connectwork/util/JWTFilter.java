@@ -22,7 +22,7 @@ import java.io.IOException;
 @WebFilter(filterName = "JWTFilter", urlPatterns = {"/usuarios/*", "/proyectos/*", "/propuestas/*",
                                                      "/contratos/*", "/entregas/*", "/categorias/*",
                                                      "/habilidades/*", "/saldos/*", "/reportes/*",
-                                                     "/admin/*"})
+                                                     "/admin/*", "/calificaciones/*", "/solicitudes/*"})
 public class JWTFilter implements Filter {
 
     @Override

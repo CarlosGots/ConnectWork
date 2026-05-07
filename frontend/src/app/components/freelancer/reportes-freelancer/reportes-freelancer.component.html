@@ -1,1 +1,112 @@
-<p>reportes-freelancer works!</p>
+<app-header></app-header>
+
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+
+  <main class="contenido">
+    <h1>Mis reportes</h1>
+    <p class="subtitulo">Consulta tu saldo, contratos e historial</p>
+
+    <div class="tabs">
+      <button [class.activo]="reporteActivo() === 'saldo'" (click)="cambiarReporte('saldo')">Saldo actual</button>
+      <button [class.activo]="reporteActivo() === 'historial-contratos'" (click)="cambiarReporte('historial-contratos')">Historial contratos</button>
+      <button [class.activo]="reporteActivo() === 'top-categorias'" (click)="cambiarReporte('top-categorias')">Top categorías</button>
+      <button [class.activo]="reporteActivo() === 'propuestas'" (click)="cambiarReporte('propuestas')">Propuestas enviadas</button>
+    </div>
+
+    @if (reporteActivo() === 'historial-contratos' || reporteActivo() === 'propuestas') {
+      <div class="filtro-fechas">
+        <div class="campo-fecha">
+          <label>Desde</label>
+          <input type="date" [ngModel]="fechaInicio()" (ngModelChange)="fechaInicio.set($event)">
+        </div>
+        <div class="campo-fecha">
+          <label>Hasta</label>
+          <input type="date" [ngModel]="fechaFin()" (ngModelChange)="fechaFin.set($event)">
+        </div>
+        <button class="btn-buscar" (click)="cargarReporte()">Buscar</button>
+      </div>
+    }
+
+    @if (cargando()) {
+      <div class="cargando">Cargando reporte...</div>
+    } @else {
+
+      @if (reporteActivo() === 'saldo') {
+        <div class="tarjetas-resumen">
+          <div class="tarjeta-metrica">
+            <span class="metrica-label">Saldo disponible</span>
+            <span class="metrica-valor monto">Q{{ saldo() | number:'1.2-2' }}</span>
+          </div>
+        </div>
+      }
+
+      @if (reporteActivo() === 'historial-contratos') {
+        @if (historialContratos().length === 0) {
+          <div class="sin-datos">No hay contratos en este rango.</div>
+        } @else {
+          <table class="tabla">
+            <thead>
+              <tr><th>Proyecto</th><th>Cliente</th><th>Monto recibido</th><th>Calificación</th><th>Fecha</th></tr>
+            </thead>
+            <tbody>
+              @for (c of historialContratos(); track $index) {
+                <tr>
+                  <td><strong>{{ c.proyecto }}</strong></td>
+                  <td>{{ c.cliente }}</td>
+                  <td class="monto">Q{{ c.montoRecibido | number:'1.2-2' }}</td>
+                  <td>{{ c.estrellas ? c.estrellas + '/5 ⭐' : 'Sin calificar' }}</td>
+                  <td>{{ formatearFecha(c.fechaCierre) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      }
+
+      @if (reporteActivo() === 'top-categorias') {
+        @if (topCategorias().length === 0) {
+          <div class="sin-datos">No hay datos disponibles.</div>
+        } @else {
+          <table class="tabla">
+            <thead>
+              <tr><th>#</th><th>Categoría</th><th>Contratos</th><th>Ingresos</th></tr>
+            </thead>
+            <tbody>
+              @for (c of topCategorias(); track $index) {
+                <tr>
+                  <td>{{ $index + 1 }}</td>
+                  <td><strong>{{ c.categoria }}</strong></td>
+                  <td>{{ c.contratos }}</td>
+                  <td class="monto">Q{{ c.ingresos | number:'1.2-2' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      }
+
+      @if (reporteActivo() === 'propuestas') {
+        @if (propuestas().length === 0) {
+          <div class="sin-datos">No hay propuestas en este rango.</div>
+        } @else {
+          <table class="tabla">
+            <thead>
+              <tr><th>Proyecto</th><th>Monto ofertado</th><th>Estado</th><th>Fecha</th></tr>
+            </thead>
+            <tbody>
+              @for (p of propuestas(); track $index) {
+                <tr>
+                  <td><strong>{{ p.proyecto }}</strong></td>
+                  <td class="monto">Q{{ p.montoOfertado | number:'1.2-2' }}</td>
+                  <td><span class="badge badge-{{ p.estado?.toLowerCase() }}">{{ p.estado }}</span></td>
+                  <td>{{ formatearFecha(p.fechaEnvio) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      }
+    }
+  </main>
+</div>

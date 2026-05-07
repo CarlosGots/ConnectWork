@@ -1,1 +1,74 @@
-<p>solicitudes-pendientes works!</p>
+<app-header></app-header>
+
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+
+  <main class="contenido">
+    <h1>Solicitudes</h1>
+    <p class="subtitulo">Solicitudes de nuevas categorías y habilidades</p>
+
+    @if (mensaje()) {
+      <div class="alerta exito">{{ mensaje() }}</div>
+    }
+    @if (mensajeError()) {
+      <div class="alerta error">{{ mensajeError() }}</div>
+    }
+
+    <div class="filtros">
+      <button [class.activo]="filtro() === 'PENDIENTE'" (click)="cambiarFiltro('PENDIENTE')">Pendientes</button>
+      <button [class.activo]="filtro() === 'ACEPTADA'" (click)="cambiarFiltro('ACEPTADA')">Aceptadas</button>
+      <button [class.activo]="filtro() === 'RECHAZADA'" (click)="cambiarFiltro('RECHAZADA')">Rechazadas</button>
+      <button [class.activo]="filtro() === 'TODAS'" (click)="cambiarFiltro('TODAS')">Todas</button>
+    </div>
+
+    @if (cargando()) {
+      <div class="cargando">Cargando solicitudes...</div>
+    } @else if (solicitudes().length === 0) {
+      <div class="sin-datos">No hay solicitudes {{ filtro() !== 'TODAS' ? 'con estado ' + filtro() : '' }}.</div>
+    } @else {
+      <div class="lista">
+        @for (s of solicitudes(); track s.idSolicitud + s.tipo) {
+          <div class="solicitud-card">
+            <div class="solicitud-header">
+              <div>
+                <span class="tipo-badge" [class.tipo-cat]="s.tipo === 'CATEGORIA'" [class.tipo-hab]="s.tipo === 'HABILIDAD'">
+                  {{ s.tipo === 'CATEGORIA' ? 'Categoría' : 'Habilidad' }}
+                </span>
+                <span class="estado-badge"
+                      [class.estado-pendiente]="s.estado === 'PENDIENTE'"
+                      [class.estado-aceptada]="s.estado === 'ACEPTADA'"
+                      [class.estado-rechazada]="s.estado === 'RECHAZADA'">
+                  {{ s.estado }}
+                </span>
+              </div>
+              <span class="fecha">{{ formatearFecha(s.fechaSolicitud) }}</span>
+            </div>
+
+            <h3>{{ s.nombrePropuesto }}</h3>
+            @if (s.descripcion) {
+              <p class="descripcion">{{ s.descripcion }}</p>
+            }
+
+            <div class="solicitud-meta">
+              @if (s.tipo === 'CATEGORIA') {
+                <span>Solicitado por: <strong>{{ s.nombreCliente }}</strong> (Cliente)</span>
+              } @else {
+                <span>Solicitado por: <strong>{{ s.nombreFreelancer }}</strong> (Freelancer)</span>
+                <span>Categoría: <strong>{{ s.nombreCategoria }}</strong></span>
+              }
+            </div>
+
+            @if (s.estado === 'PENDIENTE') {
+              <div class="acciones">
+                <button class="btn-rechazar" (click)="rechazar(s)" [disabled]="procesando() === s.idSolicitud">Rechazar</button>
+                <button class="btn-aceptar" (click)="aceptar(s)" [disabled]="procesando() === s.idSolicitud">
+                  {{ procesando() === s.idSolicitud ? 'Procesando...' : 'Aceptar' }}
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+  </main>
+</div>

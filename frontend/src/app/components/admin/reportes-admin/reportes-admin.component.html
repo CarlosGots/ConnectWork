@@ -1,1 +1,123 @@
-<p>reportes-admin works!</p>
+<app-header></app-header>
+
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+
+  <main class="contenido">
+    <h1>Reportes de Administrador</h1>
+    <p class="subtitulo">Consulta las métricas y estadísticas de la plataforma</p>
+
+    <div class="tabs">
+      <button [class.activo]="reporteActivo() === 'historial-comisiones'" (click)="cambiarReporte('historial-comisiones')">Historial comisiones</button>
+      <button [class.activo]="reporteActivo() === 'top-freelancers'" (click)="cambiarReporte('top-freelancers')">Top freelancers</button>
+      <button [class.activo]="reporteActivo() === 'top-categorias'" (click)="cambiarReporte('top-categorias')">Top categorías</button>
+      <button [class.activo]="reporteActivo() === 'ingresos-plataforma'" (click)="cambiarReporte('ingresos-plataforma')">Ingresos plataforma</button>
+    </div>
+
+    @if (reporteActivo() !== 'historial-comisiones') {
+      <div class="filtro-fechas">
+        <div class="campo-fecha">
+          <label>Desde</label>
+          <input type="date" [ngModel]="fechaInicio()" (ngModelChange)="fechaInicio.set($event)">
+        </div>
+        <div class="campo-fecha">
+          <label>Hasta</label>
+          <input type="date" [ngModel]="fechaFin()" (ngModelChange)="fechaFin.set($event)">
+        </div>
+        <button class="btn-buscar" (click)="cargarReporte()">Buscar</button>
+      </div>
+    }
+
+    @if (cargando()) {
+      <div class="cargando">Cargando reporte...</div>
+    } @else {
+
+      <!-- Historial comisiones -->
+      @if (reporteActivo() === 'historial-comisiones') {
+        @if (historialComisiones().length === 0) {
+          <div class="sin-datos">No hay registros de comisiones.</div>
+        } @else {
+          <table class="tabla">
+            <thead>
+              <tr><th>Porcentaje</th><th>Fecha inicio</th><th>Fecha fin</th></tr>
+            </thead>
+            <tbody>
+              @for (c of historialComisiones(); track $index) {
+                <tr>
+                  <td><strong>{{ c.porcentaje }}%</strong></td>
+                  <td>{{ formatearFecha(c.fechaInicio) }}</td>
+                  <td>{{ c.fechaFin ? formatearFecha(c.fechaFin) : 'Vigente' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      }
+
+      <!-- Top freelancers -->
+      @if (reporteActivo() === 'top-freelancers') {
+        @if (topFreelancers().length === 0) {
+          <div class="sin-datos">No hay datos en este rango.</div>
+        } @else {
+          <table class="tabla">
+            <thead>
+              <tr><th>#</th><th>Freelancer</th><th>Contratos</th><th>Total ganado</th><th>Comisión plataforma</th></tr>
+            </thead>
+            <tbody>
+              @for (f of topFreelancers(); track $index) {
+                <tr>
+                  <td>{{ $index + 1 }}</td>
+                  <td><strong>{{ f.nombre }}</strong></td>
+                  <td>{{ f.contratos }}</td>
+                  <td class="monto">Q{{ f.totalGanado | number:'1.2-2' }}</td>
+                  <td>Q{{ f.comisionPlataforma | number:'1.2-2' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      }
+
+      <!-- Top categorías -->
+      @if (reporteActivo() === 'top-categorias') {
+        @if (topCategorias().length === 0) {
+          <div class="sin-datos">No hay datos en este rango.</div>
+        } @else {
+          <table class="tabla">
+            <thead>
+              <tr><th>#</th><th>Categoría</th><th>Contratos</th><th>Comisiones</th></tr>
+            </thead>
+            <tbody>
+              @for (c of topCategorias(); track $index) {
+                <tr>
+                  <td>{{ $index + 1 }}</td>
+                  <td><strong>{{ c.categoria }}</strong></td>
+                  <td>{{ c.contratos }}</td>
+                  <td class="monto">Q{{ c.comisiones | number:'1.2-2' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      }
+
+      <!-- Ingresos plataforma -->
+      @if (reporteActivo() === 'ingresos-plataforma') {
+        @if (!ingresosPlataforma()) {
+          <div class="sin-datos">No hay datos.</div>
+        } @else {
+          <div class="tarjetas-resumen">
+            <div class="tarjeta-metrica">
+              <span class="metrica-label">Contratos completados</span>
+              <span class="metrica-valor">{{ ingresosPlataforma().contratos }}</span>
+            </div>
+            <div class="tarjeta-metrica">
+              <span class="metrica-label">Total comisiones</span>
+              <span class="metrica-valor monto">Q{{ ingresosPlataforma().totalComisiones | number:'1.2-2' }}</span>
+            </div>
+          </div>
+        }
+      }
+    }
+  </main>
+</div>

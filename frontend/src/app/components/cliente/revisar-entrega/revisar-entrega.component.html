@@ -1,1 +1,129 @@
-<p>revisar-entrega works!</p>
+<app-header></app-header>
+
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+
+  <main class="contenido">
+
+    <div class="pagina-header">
+      <div>
+        <h1>Revisar entregas</h1>
+        <p class="subtitulo">Revisa el trabajo entregado por el freelancer</p>
+      </div>
+    </div>
+
+    @if (mensajeExito()) {
+      <div class="mensaje-exito anim-slide-down">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+        {{ mensajeExito() }}
+      </div>
+    }
+
+    @if (mensajeError()) {
+      <div class="mensaje-error">{{ mensajeError() }}</div>
+    }
+
+    @if (cargando()) {
+      <div class="estado-vacio"><p>Cargando entregas...</p></div>
+    } @else if (entregas().length === 0) {
+      <div class="estado-vacio">
+        <div class="vacio-icono">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+        </div>
+        <h3>Sin entregas pendientes</h3>
+        <p>El freelancer aún no ha subido ninguna entrega.</p>
+      </div>
+    } @else {
+      <div class="lista-entregas">
+        @for (entrega of entregas(); track entrega.idEntrega) {
+          <div class="tarjeta-entrega">
+
+            <div class="entrega-header">
+              <div>
+                <span class="badge"
+                      [class.badge-pendiente]="entrega.estado === 'PENDIENTE'"
+                      [class.badge-aprobada]="entrega.estado === 'APROBADA'"
+                      [class.badge-rechazada]="entrega.estado === 'RECHAZADA'">
+                  {{ entrega.estado }}
+                </span>
+              </div>
+              <span class="fecha">{{ formatearFecha(entrega.fechaEntrega) }}</span>
+            </div>
+
+            <h3 class="entrega-proyecto">{{ entrega.tituloProyecto }}</h3>
+            <p class="entrega-freelancer">Freelancer: <strong>{{ entrega.nombreFreelancer }}</strong> · Monto: <strong>Q{{ entrega.montoBloqueado }}</strong></p>
+
+            <p class="descripcion">{{ entrega.descripcion }}</p>
+
+            @if (entrega.archivosUrl) {
+              <a [href]="entrega.archivosUrl" target="_blank" class="link-archivos">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
+                </svg>
+                Ver archivos entregados
+              </a>
+            }
+
+            @if (entrega.motivoRechazo) {
+              <div class="motivo-rechazo">
+                <strong>Motivo de rechazo:</strong> {{ entrega.motivoRechazo }}
+              </div>
+            }
+
+            @if (entrega.estado === 'PENDIENTE') {
+              <div class="entrega-acciones">
+                <button class="btn-rechazar"
+                        [disabled]="procesando() === entrega.idEntrega"
+                        (click)="abrirModalRechazo(entrega.idEntrega)">
+                  Rechazar
+                </button>
+                <button class="btn-aprobar"
+                        [disabled]="procesando() === entrega.idEntrega"
+                        (click)="aprobar(entrega.idEntrega)">
+                  {{ procesando() === entrega.idEntrega ? 'Procesando...' : 'Aprobar entrega' }}
+                </button>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    }
+
+  </main>
+</div>
+
+@if (modalRechazo()) {
+  <div class="modal-overlay" (click)="modalRechazo.set(false)">
+    <div class="modal-card anim-scale" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Motivo de rechazo</h2>
+        <button class="btn-cerrar-modal" (click)="modalRechazo.set(false)">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-form">
+        <div class="campo">
+          <label>¿Por qué rechazás esta entrega?</label>
+          <textarea
+            [ngModel]="motivoRechazo()"
+            (ngModelChange)="motivoRechazo.set($event)"
+            name="motivo"
+            placeholder="Describe qué falta o qué debe corregirse..."
+            rows="4"></textarea>
+        </div>
+        <div class="modal-acciones">
+          <button class="btn btn-secundario" (click)="modalRechazo.set(false)">Cancelar</button>
+          <button class="btn btn-primario" (click)="confirmarRechazo()">Confirmar rechazo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}

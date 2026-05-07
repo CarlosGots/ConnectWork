@@ -1,1 +1,99 @@
-<p>reportes-cliente works!</p>
+<app-header></app-header>
+
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+
+  <main class="contenido">
+    <h1>Mis reportes</h1>
+    <p class="subtitulo">Consulta tu actividad e historial en la plataforma</p>
+
+    <div class="tabs">
+      <button [class.activo]="reporteActivo() === 'historial-proyectos'" (click)="cambiarReporte('historial-proyectos')">Historial proyectos</button>
+      <button [class.activo]="reporteActivo() === 'historial-recargas'" (click)="cambiarReporte('historial-recargas')">Historial recargas</button>
+      <button [class.activo]="reporteActivo() === 'gasto-categorias'" (click)="cambiarReporte('gasto-categorias')">Gasto por categoría</button>
+    </div>
+
+    @if (reporteActivo() !== 'historial-recargas') {
+      <div class="filtro-fechas">
+        <div class="campo-fecha">
+          <label>Desde</label>
+          <input type="date" [ngModel]="fechaInicio()" (ngModelChange)="fechaInicio.set($event)">
+        </div>
+        <div class="campo-fecha">
+          <label>Hasta</label>
+          <input type="date" [ngModel]="fechaFin()" (ngModelChange)="fechaFin.set($event)">
+        </div>
+        <button class="btn-buscar" (click)="cargarReporte()">Buscar</button>
+      </div>
+    }
+
+    @if (cargando()) {
+      <div class="cargando">Cargando reporte...</div>
+    } @else {
+
+      @if (reporteActivo() === 'historial-proyectos') {
+        @if (historialProyectos().length === 0) {
+          <div class="sin-datos">No hay proyectos en este rango.</div>
+        } @else {
+          <table class="tabla">
+            <thead>
+              <tr><th>Proyecto</th><th>Estado</th><th>Presupuesto</th><th>Freelancer</th><th>Fecha</th></tr>
+            </thead>
+            <tbody>
+              @for (p of historialProyectos(); track $index) {
+                <tr>
+                  <td><strong>{{ p.titulo }}</strong></td>
+                  <td><span class="badge badge-{{ p.estado?.toLowerCase() }}">{{ p.estado }}</span></td>
+                  <td class="monto">Q{{ p.presupuesto | number:'1.2-2' }}</td>
+                  <td>{{ p.freelancer || '—' }}</td>
+                  <td>{{ formatearFecha(p.fecha) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      }
+
+      @if (reporteActivo() === 'historial-recargas') {
+        @if (historialRecargas().length === 0) {
+          <div class="sin-datos">No hay recargas registradas.</div>
+        } @else {
+          <table class="tabla">
+            <thead>
+              <tr><th>Monto</th><th>Fecha y hora</th></tr>
+            </thead>
+            <tbody>
+              @for (r of historialRecargas(); track $index) {
+                <tr>
+                  <td class="monto"><strong>Q{{ r.monto | number:'1.2-2' }}</strong></td>
+                  <td>{{ formatearFecha(r.fecha) }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      }
+
+      @if (reporteActivo() === 'gasto-categorias') {
+        @if (gastoCategorias().length === 0) {
+          <div class="sin-datos">No hay datos en este rango.</div>
+        } @else {
+          <table class="tabla">
+            <thead>
+              <tr><th>Categoría</th><th>Contratos</th><th>Total gastado</th></tr>
+            </thead>
+            <tbody>
+              @for (g of gastoCategorias(); track $index) {
+                <tr>
+                  <td><strong>{{ g.categoria }}</strong></td>
+                  <td>{{ g.contratos }}</td>
+                  <td class="monto">Q{{ g.totalGastado | number:'1.2-2' }}</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+      }
+    }
+  </main>
+</div>

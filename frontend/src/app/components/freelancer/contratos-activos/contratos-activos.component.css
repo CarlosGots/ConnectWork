@@ -1,0 +1,84 @@
+.layout { display: flex; min-height: calc(100vh - 64px); }
+.contenido { flex: 1; padding: 2rem; max-width: 900px; }
+.pagina-header h1 { margin: 0; color: var(--texto, #2E4057); }
+.subtitulo { color: var(--texto-suave, #6c757d); margin-top: 0.25rem; }
+
+.mensaje-exito {
+  display: flex; align-items: center; gap: 0.5rem;
+  background: #d1fae5; color: #065f46; padding: 0.75rem 1rem;
+  border-radius: 8px; margin: 1rem 0; font-size: 0.9rem;
+}
+.mensaje-error {
+  background: #fee2e2; color: #991b1b; padding: 0.75rem 1rem;
+  border-radius: 8px; margin: 1rem 0; font-size: 0.9rem;
+}
+.cargando { text-align: center; padding: 3rem; color: var(--texto-suave); }
+.vacio { text-align: center; padding: 4rem 2rem; color: var(--texto-suave); }
+.vacio svg { margin-bottom: 1rem; opacity: 0.4; }
+
+.lista-contratos { display: flex; flex-direction: column; gap: 1rem; margin-top: 1.5rem; }
+.contrato-card {
+  background: white; border: 1px solid var(--borde, #e1e5eb);
+  border-radius: 12px; padding: 1.5rem; transition: box-shadow 0.2s;
+}
+.contrato-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.contrato-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.contrato-header h3 { margin: 0; font-size: 1.1rem; color: var(--texto); }
+.contrato-desc { font-size: 0.9rem; color: var(--texto-suave); margin-bottom: 0.75rem; }
+.contrato-meta { display: flex; gap: 1.5rem; font-size: 0.85rem; color: var(--texto-suave); margin-bottom: 1rem; }
+.contrato-acciones { display: flex; gap: 0.75rem; }
+
+.badge {
+  padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600;
+}
+.badge-activo { background: #ede9fe; color: #6d28d9; }
+.badge-pendiente { background: #fef3c7; color: #92400e; }
+.badge-aprobada { background: #d1fae5; color: #065f46; }
+.badge-rechazada { background: #fee2e2; color: #991b1b; }
+
+.btn {
+  padding: 0.6rem 1.2rem; border-radius: 8px; font-size: 0.9rem;
+  cursor: pointer; border: none; transition: opacity 0.2s;
+}
+.btn-primario {
+  background: var(--gradiente, linear-gradient(135deg, #667eea, #764ba2));
+  color: white;
+}
+.btn-secundario { background: white; border: 1px solid var(--borde); color: var(--texto); }
+.btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Modal */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+  display: flex; align-items: center; justify-content: center; z-index: 1000;
+}
+.modal-content {
+  background: white; border-radius: 16px; padding: 2rem;
+  width: 90%; max-width: 560px; max-height: 80vh; overflow-y: auto;
+}
+.modal-historial { max-width: 640px; }
+.modal-content h3 { margin: 0 0 1rem; color: var(--texto); }
+.modal-acciones { display: flex; gap: 0.75rem; justify-content: flex-end; margin-top: 1.5rem; }
+
+.campo { margin-bottom: 1rem; }
+.campo label { display: block; margin-bottom: 0.4rem; font-size: 0.9rem; color: var(--texto); }
+.campo textarea, .campo input {
+  width: 100%; padding: 0.75rem; border: 1px solid var(--borde);
+  border-radius: 8px; font-family: inherit; font-size: 0.9rem; box-sizing: border-box;
+}
+.campo textarea:focus, .campo input:focus { outline: none; border-color: #667eea; }
+.opcional { color: var(--texto-suave); font-size: 0.8rem; }
+
+.entrega-item {
+  border: 1px solid var(--borde); border-radius: 8px;
+  padding: 1rem; margin-bottom: 0.75rem;
+}
+.entrega-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem; }
+.fecha { font-size: 0.8rem; color: var(--texto-suave); }
+.motivo-rechazo { color: #991b1b; font-size: 0.85rem; font-style: italic; margin-top: 0.5rem; }
+.sin-entregas { text-align: center; color: var(--texto-suave); padding: 2rem; }
+
+.anim-slide-down { animation: slideDown 0.3s ease-out; }
+.anim-scale { animation: scaleIn 0.2s ease-out; }
+@keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }

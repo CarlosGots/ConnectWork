@@ -1,1 +1,130 @@
-<p>contratos-activos works!</p>
+<app-header></app-header>
+
+<div class="layout">
+  <app-menu-lateral></app-menu-lateral>
+
+  <main class="contenido">
+    <div class="pagina-header">
+      <div>
+        <h1>Mis contratos</h1>
+        <p class="subtitulo">Gestiona tus contratos activos y sube tus entregas</p>
+      </div>
+    </div>
+
+    @if (mensajeExito()) {
+      <div class="mensaje-exito anim-slide-down">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" width="20" height="20">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5" />
+        </svg>
+        {{ mensajeExito() }}
+      </div>
+    }
+
+    @if (mensajeError()) {
+      <div class="mensaje-error">{{ mensajeError() }}</div>
+    }
+
+    @if (cargando()) {
+      <div class="cargando">Cargando contratos...</div>
+    } @else if (contratos().length === 0) {
+      <div class="vacio">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="48" height="48">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25Z" />
+        </svg>
+        <p>No tienes contratos activos en este momento</p>
+      </div>
+    } @else {
+      <div class="lista-contratos">
+        @for (contrato of contratos(); track contrato.idContrato) {
+          <div class="contrato-card anim-scale">
+            <div class="contrato-header">
+              <h3>{{ contrato.tituloProyecto }}</h3>
+              <span class="badge badge-activo">{{ contrato.estadoProyecto }}</span>
+            </div>
+            <p class="contrato-desc">{{ contrato.descripcionProyecto }}</p>
+            <div class="contrato-meta">
+              <span>Cliente: <strong>{{ contrato.nombreCliente }}</strong></span>
+              <span>Monto: <strong>Q{{ contrato.montoBloqueado }}</strong></span>
+              @if (contrato.fechaLimite) {
+                <span>Límite: <strong>{{ contrato.fechaLimite }}</strong></span>
+              }
+            </div>
+            <div class="contrato-acciones">
+              <button class="btn btn-secundario" (click)="verHistorial(contrato)">
+                Ver entregas
+              </button>
+              @if (contrato.estadoProyecto === 'EN_PROGRESO') {
+                <button class="btn btn-primario" (click)="seleccionarContrato(contrato)">
+                  Subir entrega
+                </button>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Formulario de entrega -->
+    @if (contratoSeleccionado() && !mostrandoHistorial()) {
+      <div class="modal-overlay" (click)="cancelarEntrega()">
+        <div class="modal-content anim-scale" (click)="$event.stopPropagation()">
+          <h3>Subir entrega para: {{ contratoSeleccionado().tituloProyecto }}</h3>
+
+          <div class="campo">
+            <label>Descripción del trabajo entregado *</label>
+            <textarea
+              [ngModel]="descripcion()"
+              (ngModelChange)="descripcion.set($event)"
+              placeholder="Describe qué entregás, qué incluye, cómo usar los archivos, etc."
+              rows="5"></textarea>
+          </div>
+
+          <div class="campo">
+            <label>URL de los archivos <span class="opcional">(opcional)</span></label>
+            <input type="url"
+              [ngModel]="archivosUrl()"
+              (ngModelChange)="archivosUrl.set($event)"
+              placeholder="https://drive.google.com/... o similar">
+          </div>
+
+          <div class="modal-acciones">
+            <button class="btn btn-secundario" (click)="cancelarEntrega()">Cancelar</button>
+            <button class="btn btn-primario" (click)="subirEntrega()" [disabled]="enviando()">
+              @if (enviando()) { Subiendo... } @else { Confirmar entrega }
+            </button>
+          </div>
+        </div>
+      </div>
+    }
+
+    <!-- Historial de entregas -->
+    @if (mostrandoHistorial()) {
+      <div class="modal-overlay" (click)="cerrarHistorial()">
+        <div class="modal-content modal-historial anim-scale" (click)="$event.stopPropagation()">
+          <h3>Historial de entregas: {{ contratoSeleccionado()?.tituloProyecto }}</h3>
+
+          @if (entregasContrato().length === 0) {
+            <p class="sin-entregas">No se han subido entregas para este contrato.</p>
+          } @else {
+            @for (entrega of entregasContrato(); track entrega.idEntrega) {
+              <div class="entrega-item">
+                <div class="entrega-header">
+                  <span class="badge" [class]="'badge-' + entrega.estado.toLowerCase()">{{ entrega.estado }}</span>
+                  <span class="fecha">{{ entrega.fechaEntrega }}</span>
+                </div>
+                <p>{{ entrega.descripcion }}</p>
+                @if (entrega.motivoRechazo) {
+                  <p class="motivo-rechazo">Motivo de rechazo: {{ entrega.motivoRechazo }}</p>
+                }
+              </div>
+            }
+          }
+
+          <div class="modal-acciones">
+            <button class="btn btn-secundario" (click)="cerrarHistorial()">Cerrar</button>
+          </div>
+        </div>
+      </div>
+    }
+  </main>
+</div>
