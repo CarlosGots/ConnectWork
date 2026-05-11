@@ -1,19 +1,82 @@
 <aside class="menu-lateral">
-  <nav class="menu-nav">
-
+  <nav>
     @for (item of itemsMenu(); track item.ruta) {
       <a [routerLink]="item.ruta"
          routerLinkActive="activo"
-         [routerLinkActiveOptions]="{ exact: true }"
-         class="menu-item"
-         [title]="item.etiqueta">
+         [routerLinkActiveOptions]="{ exact: item.ruta === '/cliente' || item.ruta === '/freelancer' || item.ruta === '/admin' }"
+         class="menu-item">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
              stroke-width="1.5" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" [attr.d]="item.icono" />
         </svg>
-        <span class="menu-texto">{{ item.etiqueta }}</span>
+        {{ item.etiqueta }}
       </a>
     }
-
   </nav>
+
+  @if (rolActual === 'CLIENTE') {
+    <div class="menu-solicitud">
+      <button class="btn-solicitar" (click)="abrirSolicitudCategoria()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Solicitar categoría
+      </button>
+    </div>
+  }
+
+  @if (rolActual === 'FREELANCER') {
+    <div class="menu-solicitud">
+      <button class="btn-solicitar" (click)="abrirSolicitudHabilidad()">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Solicitar habilidad
+      </button>
+    </div>
+  }
 </aside>
+
+@if (modalSolicitud) {
+  <div class="modal-overlay-sol" (click)="modalSolicitud = false">
+    <div class="modal-content-sol" (click)="$event.stopPropagation()">
+      <h3>{{ tipoSolicitud === 'categoria' ? 'Solicitar nueva categoría' : 'Solicitar nueva habilidad' }}</h3>
+
+      @if (mensajeSolicitud) {
+        <div class="alerta-exito-sol">{{ mensajeSolicitud }}</div>
+      }
+      @if (errorSolicitud) {
+        <div class="alerta-error-sol">{{ errorSolicitud }}</div>
+      }
+
+      <div class="campo-sol">
+        <label>Nombre *</label>
+        <input type="text" [(ngModel)]="nombreSolicitud"
+               [placeholder]="tipoSolicitud === 'categoria' ? 'Ej: Inteligencia Artificial' : 'Ej: TensorFlow'">
+      </div>
+
+      @if (tipoSolicitud === 'habilidad') {
+        <div class="campo-sol">
+          <label>Categoría *</label>
+          <select [(ngModel)]="categoriaSolicitudId">
+            <option [value]="0">Selecciona una categoría...</option>
+            @for (cat of categoriasList; track cat.idCategoria) {
+              <option [value]="cat.idCategoria">{{ cat.nombre }}</option>
+            }
+          </select>
+        </div>
+      }
+
+      <div class="campo-sol">
+        <label>Descripción (opcional)</label>
+        <textarea [(ngModel)]="descripcionSolicitud" rows="3"
+                  placeholder="Describe brevemente por qué se necesita..."></textarea>
+      </div>
+
+      <div class="acciones-sol">
+        <button class="btn-cancelar-sol" (click)="modalSolicitud = false">Cancelar</button>
+        <button class="btn-enviar-sol" (click)="enviarSolicitud()">Enviar solicitud</button>
+      </div>
+    </div>
+  </div>
+}

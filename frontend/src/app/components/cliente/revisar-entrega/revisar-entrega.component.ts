@@ -23,9 +23,18 @@ export class RevisarEntregaComponent implements OnInit {
   mensajeExito = signal<string>('');
   mensajeError = signal<string>('');
   procesando = signal<number | null>(null);
-modalCancelar = signal(false);
-idContratoCancelar = signal<number | null>(null);
-motivoCancelacion = signal('');
+  modalCancelar = signal(false);
+  idContratoCancelar = signal<number | null>(null);
+  motivoCancelacion = signal('');
+  modalArchivos = signal(false);
+  entregaArchivos = signal<any>(null);
+
+verArchivos(entrega: any) {
+  this.entregaArchivos.set(entrega);
+  this.modalArchivos.set(true);
+}
+
+
   // Modal de rechazo
   modalRechazo = signal<boolean>(false);
   idEntregaRechazar = signal<number | null>(null);

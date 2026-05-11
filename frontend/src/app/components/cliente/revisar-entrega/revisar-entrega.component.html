@@ -61,13 +61,13 @@
             <p class="descripcion">{{ entrega.descripcion }}</p>
 
             @if (entrega.archivosUrl) {
-              <a [href]="entrega.archivosUrl" target="_blank" class="link-archivos">
+              <button class="link-archivos" (click)="verArchivos(entrega)">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round"
                         d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
                 </svg>
                 Ver archivos entregados
-              </a>
+              </button>
             }
 
             @if (entrega.motivoRechazo) {
@@ -157,6 +157,40 @@
         <div class="modal-acciones">
           <button class="btn btn-secundario" (click)="modalCancelar.set(false)">Volver</button>
           <button class="btn-cancelar-confirmar" (click)="confirmarCancelacion()">Confirmar cancelación</button>
+        </div>
+      </div>
+    </div>
+  </div>
+}
+
+@if (modalArchivos()) {
+  <div class="modal-overlay" (click)="modalArchivos.set(false)">
+    <div class="modal-card anim-scale" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Archivos entregados</h2>
+        <button class="btn-cerrar-modal" (click)="modalArchivos.set(false)">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div class="modal-form">
+        <p class="archivos-proyecto"><strong>Proyecto:</strong> {{ entregaArchivos()?.tituloProyecto }}</p>
+        <p class="archivos-freelancer"><strong>Freelancer:</strong> {{ entregaArchivos()?.nombreFreelancer }}</p>
+        <div class="archivos-url-box">
+          <label>URL de los archivos:</label>
+          <div class="url-contenido">
+            <span>{{ entregaArchivos()?.archivosUrl }}</span>
+            <a [href]="entregaArchivos()?.archivosUrl" target="_blank" rel="noopener noreferrer" class="btn-abrir-externo">
+              Abrir enlace externo
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="16" height="16">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 0 0 3 8.25v10.5A2.25 2.25 0 0 0 5.25 21h10.5A2.25 2.25 0 0 0 18 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              </svg>
+            </a>
+          </div>
+        </div>
+        <div class="modal-acciones">
+          <button class="btn btn-secundario" (click)="modalArchivos.set(false)">Cerrar</button>
         </div>
       </div>
     </div>

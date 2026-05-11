@@ -234,3 +234,19 @@ input:focus, textarea:focus, select:focus {
   background: var(--primario);
   color: white;
 }
+/* ============================================
+   FOOTER STICKY
+   ============================================ */
+html, body {
+  min-height: 100vh;
+}
+
+app-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+router-outlet + * {
+  flex: 1;
+}
